@@ -1,10 +1,10 @@
-import DataTableDemo from '@/components/DataTable';
+import LogTable from '@/components/LogTable';
+import { Button } from 'primereact/button'
 
 export default function Home() {
   return (
     <main>
-      <h1>PrimeReact DataTable Demo</h1>
-      <DataTableDemo />
+      <LogTable />
     </main>
   );
 }
