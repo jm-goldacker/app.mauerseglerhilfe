@@ -1,5 +1,4 @@
-import LogTable from '@/components/LogTable';
-import { Button } from 'primereact/button'
+import LogTable from "@/components/LogTable";
 
 export default function Home() {
   return (
