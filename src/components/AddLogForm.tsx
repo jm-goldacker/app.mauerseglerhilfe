@@ -1,122 +1,206 @@
 import React, { FC, useEffect, useState } from "react";
-import { Button } from 'primereact/button';
-import { Calendar } from 'primereact/calendar';
-import { InputMask } from 'primereact/inputmask';
+import { Button } from "primereact/button";
+import { Calendar } from "primereact/calendar";
+import { InputMask } from "primereact/inputmask";
 import { InputText } from "primereact/inputtext";
-import { Age, LogEntry } from "./types";
+import { Age, BirdSpecies, LogEntry } from "./types";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
+import {
+  AutoComplete,
+  AutoCompleteCompleteEvent,
+} from "primereact/autocomplete";
 
 type Props = {
-    onAdd: (entry: LogEntry) => void
-}
+  onAdd: (entry: LogEntry) => void;
+};
 
-const AddLogForm: FC<Props> =({
-    onAdd
-}) => {
-    const [date, setDate] = useState<Date>(new Date());
-    const [age, setAge] = useState<Age>("chick");
-    const ageOptions: Age[] = ["chick", "young", "old"];
-    const [takenInDate, setTakenInDate] = useState<Date | undefined>();
-    const [zipFoundAt, setZipFoundAt] = useState<string | undefined>(undefined);
-    const [description, setDescription] = useState<string | undefined>();
-    const [redirectedTo, setRedirectedTo] = useState<string | undefined>();
-    const [letFreeDate, setLetFreeDate] = useState<Date | undefined>();
-    const [diedDate, setDiedDate] = useState<Date | undefined>();
-    const [euthanasiaDate, setEuthanasiaDate] = useState<Date | undefined>();
+const AddLogForm: FC<Props> = ({ onAdd }) => {
+  const [date, setDate] = useState<Date>(new Date());
+  const [age, setAge] = useState<Age>("chick");
+  const ageOptions: Age[] = ["chick", "young", "old"];
+  const [species, setSpecies] = useState<BirdSpecies>();
+  const [speciesSuggestion, setSpeciesSuggestion] = useState<BirdSpecies[]>();
+  const [takenInDate, setTakenInDate] = useState<Date | undefined>();
+  const [zipFoundAt, setZipFoundAt] = useState<string | undefined>(undefined);
+  const [description, setDescription] = useState<string | undefined>();
+  const [redirectedTo, setRedirectedTo] = useState<string | undefined>();
+  const [letFreeDate, setLetFreeDate] = useState<Date | undefined>();
+  const [diedDate, setDiedDate] = useState<Date | undefined>();
+  const [euthanasiaDate, setEuthanasiaDate] = useState<Date | undefined>();
 
-    const addEntry = () => {
-        const entry: LogEntry = {
-            id: 0,
-            date: date,
-            age: age,
-            birdSpecies: {
-                id: 0,
-                description: "Vogelart"
-            },
-            takenInBy: "nutzer",
-            takenInDate: takenInDate,
-            zipFoundAt: zipFoundAt,
-            description: description,
-            redirectedTo: redirectedTo,
-            letFreeDate: letFreeDate,
-            diedDate: diedDate,
-            euthanasiaDate: euthanasiaDate
-        }
+  const allSpecies: BirdSpecies[] = [
+    { id: 0, description: "Amsel" },
+    { id: 1, description: "Mauersegler" },
+    { id: 2, description: "Spatz" },
+    { id: 3, description: "Möwe" },
+  ];
 
-        onAdd(entry);
-    }
+  const searchSpecies = (event: AutoCompleteCompleteEvent) => {
+    setSpeciesSuggestion(
+      allSpecies.filter((species) =>
+        species.description.toLowerCase().includes(event.query.toLowerCase()),
+      ),
+    );
+  };
 
-    return (
-        <div className="grid grid-flow-row auto-rows-max">  
-        <div className="flex-auto">
-                <label htmlFor="buttondisplay" className="font-bold block mb-2">
-                    Datum
-                </label>
+  const addEntry = () => {
+    const entry: LogEntry = {
+      id: 0,
+      date: date,
+      age: age,
+      birdSpecies: {
+        id: 0,
+        description: "Vogelart",
+      },
+      takenInBy: "nutzer",
+      takenInDate: takenInDate,
+      zipFoundAt: zipFoundAt,
+      description: description,
+      redirectedTo: redirectedTo,
+      letFreeDate: letFreeDate,
+      diedDate: diedDate,
+      euthanasiaDate: euthanasiaDate,
+    };
 
-                <Calendar value={date} onChange={(e) => { if (!e.value) return; setDate(e.value)}}  />
-            </div>
-             <div className="flex-auto">
-                <label htmlFor="buttondisplay" className="font-bold block mb-2">
-                    Alter
-                </label>
+    onAdd(entry);
+  };
 
-                <Dropdown value={age} onChange={(e: DropdownChangeEvent) => setAge(e.value)} options={ageOptions} optionLabel="name" 
-                placeholder="Alter auswählen"  />
-            </div>
-            <div className="flex-auto">
-                <label htmlFor="buttondisplay" className="font-bold block mb-2">
-                    Aufgenommen am
-                </label>
+  return (
+    <div className="grid grid-flow-row auto-rows-max">
+      <div className="flex-auto">
+        <label htmlFor="buttondisplay" className="font-bold block mb-2">
+          Datum
+        </label>
 
-                <Calendar value={takenInDate} onChange={(e) => { if (!e.value) return; setTakenInDate(e.value)}}   />
-            </div>
-            <div className="flex-auto">
-                <label htmlFor="buttondisplay" className="font-bold block mb-2">
-                    PLZ Fundort
-                </label>
+        <Calendar
+          value={date}
+          onChange={(e) => {
+            if (!e.value) return;
+            setDate(e.value);
+          }}
+        />
+      </div>
+      <div className="flex-auto">
+        <label htmlFor="buttondisplay" className="font-bold block mb-2">
+          Alter
+        </label>
 
-                <InputMask mask="99999" value={zipFoundAt} onChange={(e) => { if (!e.value) return; setZipFoundAt(e.value)}}  />
-            </div>
-            <div className="flex-auto">
-                <label htmlFor="buttondisplay" className="font-bold block mb-2">
-                    Beschreibung
-                </label>
+        <Dropdown
+          value={age}
+          onChange={(e: DropdownChangeEvent) => setAge(e.value)}
+          options={ageOptions}
+          optionLabel="name"
+          placeholder="Alter auswählen"
+        />
+      </div>
+      <div className="flex-auto">
+        <label htmlFor="buttondisplay" className="font-bold block mb-2">
+          Art
+        </label>
 
-                <InputText value={description} onChange={(e) => { setDescription(e.target.value)}}  />
-            </div>
-            <div className="flex-auto">
-                <label htmlFor="buttondisplay" className="font-bold block mb-2">
-                    Weitergeleitet an
-                </label>
+        <AutoComplete
+          field="description"
+          value={species}
+          suggestions={speciesSuggestion}
+          completeMethod={searchSpecies}
+          onChange={(e) => setSpecies(e.value)}
+        />
+      </div>
+      <div className="flex-auto">
+        <label htmlFor="buttondisplay" className="font-bold block mb-2">
+          Aufgenommen am
+        </label>
 
-                <InputText value={redirectedTo} onChange={(e) => { setRedirectedTo(e.target.value)}}  />
-            </div>
-            <div className="flex-auto">
-                <label htmlFor="buttondisplay" className="font-bold block mb-2">
-                    Freigelassen am
-                </label>
+        <Calendar
+          value={takenInDate}
+          onChange={(e) => {
+            if (!e.value) return;
+            setTakenInDate(e.value);
+          }}
+        />
+      </div>
+      <div className="flex-auto">
+        <label htmlFor="buttondisplay" className="font-bold block mb-2">
+          PLZ Fundort
+        </label>
 
-                <Calendar value={letFreeDate} onChange={(e) => { if (!e.value) return; setLetFreeDate(e.value)}}   />
-            </div>
-            <div className="flex-auto">
-                <label htmlFor="buttondisplay" className="font-bold block mb-2">
-                    Verstorben am
-                </label>
+        <InputMask
+          mask="99999"
+          value={zipFoundAt}
+          onChange={(e) => {
+            if (!e.value) return;
+            setZipFoundAt(e.value);
+          }}
+        />
+      </div>
+      <div className="flex-auto">
+        <label htmlFor="buttondisplay" className="font-bold block mb-2">
+          Beschreibung
+        </label>
 
-                <Calendar value={diedDate} onChange={(e) => { if (!e.value) return; setDiedDate(e.value)}}   />
-            </div>
-            <div className="flex-auto">
-                <label htmlFor="buttondisplay" className="font-bold block mb-2">
-                    Euthanasie am
-                </label>
+        <InputText
+          value={description}
+          onChange={(e) => {
+            setDescription(e.target.value);
+          }}
+        />
+      </div>
+      <div className="flex-auto">
+        <label htmlFor="buttondisplay" className="font-bold block mb-2">
+          Weitergeleitet an
+        </label>
 
-                <Calendar value={euthanasiaDate} onChange={(e) => { if (!e.value) return; setEuthanasiaDate(e.value)}}   />
-            </div>
-            <div className="flex-auto">
-                <Button onClick={() => addEntry()}>Add</Button>
-            </div>
-        </div>
-    )
-}
+        <InputText
+          value={redirectedTo}
+          onChange={(e) => {
+            setRedirectedTo(e.target.value);
+          }}
+        />
+      </div>
+      <div className="flex-auto">
+        <label htmlFor="buttondisplay" className="font-bold block mb-2">
+          Freigelassen am
+        </label>
+
+        <Calendar
+          value={letFreeDate}
+          onChange={(e) => {
+            if (!e.value) return;
+            setLetFreeDate(e.value);
+          }}
+        />
+      </div>
+      <div className="flex-auto">
+        <label htmlFor="buttondisplay" className="font-bold block mb-2">
+          Verstorben am
+        </label>
+
+        <Calendar
+          value={diedDate}
+          onChange={(e) => {
+            if (!e.value) return;
+            setDiedDate(e.value);
+          }}
+        />
+      </div>
+      <div className="flex-auto">
+        <label htmlFor="buttondisplay" className="font-bold block mb-2">
+          Euthanasie am
+        </label>
+
+        <Calendar
+          value={euthanasiaDate}
+          onChange={(e) => {
+            if (!e.value) return;
+            setEuthanasiaDate(e.value);
+          }}
+        />
+      </div>
+      <div className="flex-auto">
+        <Button onClick={() => addEntry()}>Add</Button>
+      </div>
+    </div>
+  );
+};
 
 export default AddLogForm;
