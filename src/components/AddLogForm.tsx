@@ -20,13 +20,13 @@ const AddLogForm: FC<Props> = ({ onAdd }) => {
   const ageOptions: Age[] = ["chick", "young", "old"];
   const [species, setSpecies] = useState<BirdSpecies>();
   const [speciesSuggestion, setSpeciesSuggestion] = useState<BirdSpecies[]>();
-  const [takenInDate, setTakenInDate] = useState<Date | undefined>();
-  const [zipFoundAt, setZipFoundAt] = useState<string | undefined>(undefined);
-  const [description, setDescription] = useState<string | undefined>();
-  const [redirectedTo, setRedirectedTo] = useState<string | undefined>();
-  const [letFreeDate, setLetFreeDate] = useState<Date | undefined>();
-  const [diedDate, setDiedDate] = useState<Date | undefined>();
-  const [euthanasiaDate, setEuthanasiaDate] = useState<Date | undefined>();
+  const [takenInDate, setTakenInDate] = useState<Date>();
+  const [zipFoundAt, setZipFoundAt] = useState<string>();
+  const [description, setDescription] = useState<string>();
+  const [redirectedTo, setRedirectedTo] = useState<string>();
+  const [letFreeDate, setLetFreeDate] = useState<Date>();
+  const [diedDate, setDiedDate] = useState<Date>();
+  const [euthanasiaDate, setEuthanasiaDate] = useState<Date>();
 
   const allSpecies: BirdSpecies[] = [
     { id: 0, description: "Amsel" },
@@ -44,14 +44,13 @@ const AddLogForm: FC<Props> = ({ onAdd }) => {
   };
 
   const addEntry = () => {
+    if (!species) return;
+
     const entry: LogEntry = {
       id: 0,
       date: date,
       age: age,
-      birdSpecies: {
-        id: 0,
-        description: "Vogelart",
-      },
+      birdSpecies: species,
       takenInBy: "nutzer",
       takenInDate: takenInDate,
       zipFoundAt: zipFoundAt,
