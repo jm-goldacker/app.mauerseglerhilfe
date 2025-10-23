@@ -19,7 +19,8 @@ const AddLogForm: FC<Props> = ({ onAdd }) => {
   const [age, setAge] = useState<Age>("chick");
   const ageOptions: Age[] = ["chick", "young", "old"];
   const [species, setSpecies] = useState<BirdSpecies>();
-  const [speciesSuggestion, setSpeciesSuggestion] = useState<BirdSpecies[]>();
+  const [speciesName, setSpeciesName] = useState<string>();
+  const [speciesSuggestion, setSpeciesSuggestion] = useState<string[]>();
   const [takenInDate, setTakenInDate] = useState<Date>();
   const [zipFoundAt, setZipFoundAt] = useState<string>();
   const [description, setDescription] = useState<string>();
@@ -37,13 +38,16 @@ const AddLogForm: FC<Props> = ({ onAdd }) => {
 
   const searchSpecies = (event: AutoCompleteCompleteEvent) => {
     setSpeciesSuggestion(
-      allSpecies.filter((species) =>
-        species.description.toLowerCase().includes(event.query.toLowerCase()),
+      speciesNames.filter((species) =>
+        species.toLowerCase().includes(event.query.toLowerCase()),
       ),
     );
   };
 
+  const speciesNames = allSpecies.map(species => species.description);
+
   const addEntry = () => {
+    
     if (!species) return;
 
     const entry: LogEntry = {
@@ -63,6 +67,17 @@ const AddLogForm: FC<Props> = ({ onAdd }) => {
 
     onAdd(entry);
   };
+
+  const autoCompleteName = () => {
+    if (!speciesName) return;
+
+    var exisitingSpecies = allSpecies.find(species => species.description.toLowerCase().includes(speciesName.toLowerCase()));
+
+    if (exisitingSpecies) {
+        setSpecies(exisitingSpecies);
+        setSpeciesName(exisitingSpecies.description);
+    }
+  }
 
   return (
     <div className="grid grid-flow-row auto-rows-max">
@@ -98,11 +113,12 @@ const AddLogForm: FC<Props> = ({ onAdd }) => {
         </label>
 
         <AutoComplete
-          field="description"
-          value={species}
+          value={speciesName}
           suggestions={speciesSuggestion}
           completeMethod={searchSpecies}
-          onChange={(e) => setSpecies(e.value)}
+          onChange={(e) => setSpeciesName(e.value)}
+          onBlur={autoCompleteName}
+          dropdown 
         />
       </div>
       <div className="flex-auto">
