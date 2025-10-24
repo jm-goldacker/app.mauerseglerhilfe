@@ -14,29 +14,46 @@ import { useSession } from "next-auth/react";
 
 type Props = {
   onAdd: (entry: LogEntry) => void;
+  editEntry: LogEntry | undefined;
 };
 
-const AddLogForm: FC<Props> = ({ onAdd }) => {
-  const [date, setDate] = useState<Date>(new Date());
-  const [age, setAge] = useState<Age>("chick");
-  const ageOptions: Age[] = ["chick", "young", "old"];
+const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
+  const [date, setDate] = useState<Date>(editEntry?.date ?? new Date());
+  const [age, setAge] = useState<Age>(editEntry?.age ?? "Küken");
+  const ageOptions: Age[] = ["Küken", "Jungtier", "Ausgewachsen"];
 
+  const [selectedSpecies, setSelectedSpecies] = useState<string | undefined>(
+    editEntry?.birdSpecies,
+  );
   const [allSpecies, setAllSpecies] = useState<string[]>([]);
-  const [selectedSpecies, setSelectedSpecies] = useState<string>();
   const [speciesSuggestion, setSpeciesSuggestion] = useState<string[]>([]);
 
+  const [selectedCircumstance, setSelectedCircumstance] = useState<
+    string | undefined
+  >(editEntry?.circumstance);
   const [allCircumstances, setCircumstances] = useState<string[]>([]);
-  const [selectedCircumstance, setSelectedCircumstance] = useState<string>();
   const [circumstanceSuggestions, setCircumstanceSuggestions] = useState<
     string[]
   >([]);
 
-  const [takenInDate, setTakenInDate] = useState<Date>();
-  const [zipFoundAt, setZipFoundAt] = useState<string>();
-  const [redirectedTo, setRedirectedTo] = useState<string>();
-  const [letFreeDate, setLetFreeDate] = useState<Date>();
-  const [diedDate, setDiedDate] = useState<Date>();
-  const [euthanasiaDate, setEuthanasiaDate] = useState<Date>();
+  const [takenInDate, setTakenInDate] = useState<Date | undefined>(
+    editEntry?.takenInDate ?? undefined,
+  );
+  const [zipFoundAt, setZipFoundAt] = useState<string | undefined>(
+    editEntry?.zipFoundAt,
+  );
+  const [redirectedTo, setRedirectedTo] = useState<string | undefined>(
+    editEntry?.redirectedTo,
+  );
+  const [letFreeDate, setLetFreeDate] = useState<Date | undefined>(
+    editEntry?.letFreeDate,
+  );
+  const [diedDate, setDiedDate] = useState<Date | undefined>(
+    editEntry?.diedDate,
+  );
+  const [euthanasiaDate, setEuthanasiaDate] = useState<Date | undefined>(
+    editEntry?.euthanasiaDate,
+  );
 
   const session = useSession();
 
@@ -95,6 +112,8 @@ const AddLogForm: FC<Props> = ({ onAdd }) => {
 
     if (existingCircumstance) {
       setSelectedCircumstance(existingCircumstance);
+    } else {
+      setSelectedCircumstance(undefined);
     }
   };
 
@@ -102,18 +121,18 @@ const AddLogForm: FC<Props> = ({ onAdd }) => {
     if (!selectedSpecies || !selectedCircumstance) return;
 
     const entry: LogEntry = {
-      id: 0,
+      id: editEntry?.id ?? 0,
       date: date,
       age: age,
       birdSpecies: selectedSpecies,
       takenInBy: session.data?.user?.name ?? "anonym",
-      takenInDate: takenInDate?.toISOString(),
+      takenInDate: takenInDate,
       zipFoundAt: zipFoundAt,
       circumstance: selectedCircumstance,
       redirectedTo: redirectedTo,
-      letFreeDate: letFreeDate?.toISOString(),
-      diedDate: diedDate?.toISOString(),
-      euthanasiaDate: euthanasiaDate?.toISOString(),
+      letFreeDate: letFreeDate,
+      diedDate: diedDate,
+      euthanasiaDate: euthanasiaDate,
     };
 
     onAdd(entry);
@@ -208,7 +227,7 @@ const AddLogForm: FC<Props> = ({ onAdd }) => {
         </label>
 
         <InputText
-          value={redirectedTo}
+          placeholder={redirectedTo}
           onChange={(e) => {
             setRedirectedTo(e.target.value);
           }}

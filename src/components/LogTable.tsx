@@ -1,7 +1,11 @@
 "use client"; // Wichtig: PrimeReact-Komponenten müssen auf der Client-Seite gerendert werden
 
 import React, { FC, useEffect, useState } from "react";
-import { DataTable, DataTableRowEditCompleteEvent } from "primereact/datatable";
+import {
+  DataTable,
+  DataTableRowEditCompleteEvent,
+  DataTableRowEditEvent,
+} from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
 import { LogEntry } from "./types";
@@ -12,6 +16,7 @@ import apiRequest from "@/core/apiClient";
 
 export default function LogTable() {
   const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
+  const [editEntry, setEditEntry] = useState<LogEntry>();
   const [dialogVisible, setDialogVisible] = useState<boolean>(false);
 
   const getLogEntries = async () => {
@@ -42,10 +47,21 @@ export default function LogTable() {
     setLogEntries(_products);
   };
 
+  const onRowEditInit = (e: DataTableRowEditEvent) => {
+    setEditEntry(e.data as LogEntry);
+    setDialogVisible(true);
+  };
+
   async function addNewEntry(newEntry: LogEntry): Promise<void> {
-    await apiRequest("api/LogEntries", "POST", newEntry);
+    if (!editEntry) {
+      await apiRequest("api/LogEntries", "POST", newEntry);
+    } else {
+      await apiRequest("api/LogEntries/" + newEntry.id, "PUT", newEntry);
+      setEditEntry(undefined);
+    }
 
     getLogEntries();
+    hideDialog();
   }
 
   const hideDialog = () => {
@@ -56,7 +72,7 @@ export default function LogTable() {
   return (
     <div className="card">
       <Dialog onHide={hideDialog} visible={dialogVisible}>
-        <AddLogForm onAdd={addNewEntry} />
+        <AddLogForm onAdd={addNewEntry} editEntry={editEntry} />
       </Dialog>
 
       <DataTable
@@ -64,6 +80,7 @@ export default function LogTable() {
         tableStyle={{ minWidth: "50rem" }}
         editMode="row"
         onRowEditComplete={onRowEditComplete}
+        onRowEditInit={onRowEditInit}
       >
         <Column
           field="id"
@@ -88,6 +105,7 @@ export default function LogTable() {
           }
           sortable
         />
+        <Column field="age" header="Alter" sortable />
         <Column field="takenInBy" header="Aufgenommen von" sortable />
         <Column field="zipFoundAt" header="Fundort (PLZ)" sortable />
         <Column field="description" header="Beschreibung" sortable />

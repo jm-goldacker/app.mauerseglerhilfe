@@ -3,14 +3,14 @@ export type LogEntry = {
   date: Date;
   age: Age;
   birdSpecies: string;
-  takenInDate: string | undefined;
+  takenInDate: Date | undefined;
   takenInBy: string;
   zipFoundAt: string | undefined;
   circumstance: string;
   redirectedTo: string | undefined;
-  letFreeDate: string | undefined;
-  diedDate: string | undefined;
-  euthanasiaDate: string | undefined;
+  letFreeDate: Date | undefined;
+  diedDate: Date | undefined;
+  euthanasiaDate: Date | undefined;
 };
 
 export type BirdSpecies = {
@@ -21,4 +21,4 @@ export type Circumstance = {
   name: string;
 };
 
-export type Age = "chick" | "young" | "old";
+export type Age = "Küken" | "Jungtier" | "Ausgewachsen";
