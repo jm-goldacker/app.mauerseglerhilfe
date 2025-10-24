@@ -3,12 +3,14 @@ import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { InputMask } from "primereact/inputmask";
 import { InputText } from "primereact/inputtext";
-import { Age, BirdSpecies, LogEntry } from "./types";
+import { Age, BirdSpecies, Circumstance, LogEntry } from "./types";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import {
   AutoComplete,
   AutoCompleteCompleteEvent,
 } from "primereact/autocomplete";
+import apiRequest from "@/core/apiClient";
+import { spec } from "node:test/reporters";
 
 type Props = {
   onAdd: (entry: LogEntry) => void;
@@ -18,66 +20,102 @@ const AddLogForm: FC<Props> = ({ onAdd }) => {
   const [date, setDate] = useState<Date>(new Date());
   const [age, setAge] = useState<Age>("chick");
   const ageOptions: Age[] = ["chick", "young", "old"];
-  const [species, setSpecies] = useState<BirdSpecies>();
-  const [speciesName, setSpeciesName] = useState<string>();
-  const [speciesSuggestion, setSpeciesSuggestion] = useState<string[]>();
+
+  const [allSpecies, setAllSpecies] = useState<string[]>([]);
+  const [selectedSpecies, setSelectedSpecies] = useState<string>();
+  const [speciesSuggestion, setSpeciesSuggestion] = useState<string[]>([]);
+
+  const [allCircumstances, setCircumstances] = useState<string[]>([]);
+  const [selectedCircumstance, setSelectedCircumstance] = useState<string>();
+  const [circumstanceSuggestions, setCircumstanceSuggestions] = useState<
+    string[]
+  >([]);
+
   const [takenInDate, setTakenInDate] = useState<Date>();
   const [zipFoundAt, setZipFoundAt] = useState<string>();
-  const [description, setDescription] = useState<string>();
   const [redirectedTo, setRedirectedTo] = useState<string>();
   const [letFreeDate, setLetFreeDate] = useState<Date>();
   const [diedDate, setDiedDate] = useState<Date>();
   const [euthanasiaDate, setEuthanasiaDate] = useState<Date>();
 
-  const allSpecies: BirdSpecies[] = [
-    { id: 0, description: "Amsel" },
-    { id: 1, description: "Mauersegler" },
-    { id: 2, description: "Spatz" },
-    { id: 3, description: "Möwe" },
-  ];
+  useEffect(() => {
+    const getBirdSpecies = async () => {
+      const data = await apiRequest<BirdSpecies[]>("/api/BirdSpecies", "GET");
+      setAllSpecies(data.map((s) => s.name));
+    };
+
+    const getCircumstances = async () => {
+      const data = await apiRequest<Circumstance[]>(
+        "/api/Circumstances",
+        "GET",
+      );
+      setCircumstances(data.map((c) => c.name));
+    };
+
+    getBirdSpecies();
+    getCircumstances();
+  }, []);
 
   const searchSpecies = (event: AutoCompleteCompleteEvent) => {
     setSpeciesSuggestion(
-      speciesNames.filter((species) =>
-        species.toLowerCase().includes(event.query.toLowerCase()),
+      allSpecies.filter((s) =>
+        s.toLowerCase().includes(event.query.toLowerCase()),
       ),
     );
   };
 
-  const speciesNames = allSpecies.map(species => species.description);
+  const searchCircumstances = (event: AutoCompleteCompleteEvent) => {
+    setCircumstanceSuggestions(
+      allCircumstances.filter((c) =>
+        c.toLowerCase().includes(event.query.toLowerCase()),
+      ),
+    );
+  };
+
+  const autoCompleteSpecies = () => {
+    if (!selectedSpecies) return;
+
+    var exisitingSpecies = allSpecies.find((species) =>
+      species.toLowerCase().includes(selectedSpecies.toLowerCase()),
+    );
+
+    if (exisitingSpecies) {
+      setSelectedSpecies(exisitingSpecies);
+    }
+  };
+
+  const autoCompleteCircumstance = () => {
+    if (!selectedCircumstance) return;
+
+    var existingCircumstance = allCircumstances.find((c) =>
+      c.toLowerCase().includes(selectedCircumstance.toLowerCase()),
+    );
+
+    if (existingCircumstance) {
+      setSelectedCircumstance(existingCircumstance);
+    }
+  };
 
   const addEntry = () => {
-    
-    if (!species) return;
+    if (!selectedSpecies || !selectedCircumstance) return;
 
     const entry: LogEntry = {
       id: 0,
       date: date,
       age: age,
-      birdSpecies: species,
+      birdSpecies: selectedSpecies,
       takenInBy: "nutzer",
-      takenInDate: takenInDate,
+      takenInDate: takenInDate?.toISOString(),
       zipFoundAt: zipFoundAt,
-      description: description,
+      circumstance: selectedCircumstance,
       redirectedTo: redirectedTo,
-      letFreeDate: letFreeDate,
-      diedDate: diedDate,
-      euthanasiaDate: euthanasiaDate,
+      letFreeDate: letFreeDate?.toISOString(),
+      diedDate: diedDate?.toISOString(),
+      euthanasiaDate: euthanasiaDate?.toISOString(),
     };
 
     onAdd(entry);
   };
-
-  const autoCompleteName = () => {
-    if (!speciesName) return;
-
-    var exisitingSpecies = allSpecies.find(species => species.description.toLowerCase().includes(speciesName.toLowerCase()));
-
-    if (exisitingSpecies) {
-        setSpecies(exisitingSpecies);
-        setSpeciesName(exisitingSpecies.description);
-    }
-  }
 
   return (
     <div className="grid grid-flow-row auto-rows-max">
@@ -113,12 +151,12 @@ const AddLogForm: FC<Props> = ({ onAdd }) => {
         </label>
 
         <AutoComplete
-          value={speciesName}
+          value={selectedSpecies}
           suggestions={speciesSuggestion}
           completeMethod={searchSpecies}
-          onChange={(e) => setSpeciesName(e.value)}
-          onBlur={autoCompleteName}
-          dropdown 
+          onChange={(e) => setSelectedSpecies(e.value)}
+          onBlur={autoCompleteSpecies}
+          dropdown
         />
       </div>
       <div className="flex-auto">
@@ -153,11 +191,13 @@ const AddLogForm: FC<Props> = ({ onAdd }) => {
           Beschreibung
         </label>
 
-        <InputText
-          value={description}
-          onChange={(e) => {
-            setDescription(e.target.value);
-          }}
+        <AutoComplete
+          value={selectedCircumstance}
+          suggestions={circumstanceSuggestions}
+          completeMethod={searchCircumstances}
+          onChange={(e) => setSelectedCircumstance(e.value)}
+          onBlur={autoCompleteCircumstance}
+          dropdown
         />
       </div>
       <div className="flex-auto">

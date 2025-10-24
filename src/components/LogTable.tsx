@@ -1,6 +1,6 @@
 "use client"; // Wichtig: PrimeReact-Komponenten müssen auf der Client-Seite gerendert werden
 
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { DataTable, DataTableRowEditCompleteEvent } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
@@ -8,10 +8,20 @@ import { LogEntry } from "./types";
 import AddLogForm from "./AddLogForm";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
+import apiRequest from "@/core/apiClient";
 
 export default function LogTable() {
   const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
   const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+
+  const getLogEntries = async () => {
+    const data = await apiRequest<LogEntry[]>("/api/LogEntries", "GET");
+    setLogEntries(data);
+  };
+
+  useEffect(() => {
+    getLogEntries();
+  }, []);
 
   const textEditor = (options: any) => {
     return (
@@ -32,8 +42,10 @@ export default function LogTable() {
     setLogEntries(_products);
   };
 
-  function addNewEntry(newEntry: LogEntry): void {
-    setLogEntries([...logEntries, newEntry]);
+  async function addNewEntry(newEntry: LogEntry): Promise<void> {
+    await apiRequest("api/LogEntries", "POST", newEntry);
+
+    getLogEntries();
   }
 
   const hideDialog = () => {
@@ -62,16 +74,16 @@ export default function LogTable() {
         <Column
           field="date"
           header="Erfassungsdatum"
-          body={(rowData) => rowData.date.toLocaleDateString("de-DE")}
+          body={(rowData) => new Date(rowData.date).toLocaleDateString("de-DE")}
           sortable
         />
-        <Column field="birdSpecies.description" header="Vogelart" sortable />
+        <Column field="birdSpecies" header="Vogelart" sortable />
         <Column
           field="takenInDate"
           header="Aufnahmedatum"
           body={(rowData) =>
             rowData.takenInDate
-              ? rowData.takenInDate.toLocaleDateString("de-DE")
+              ? new Date(rowData.takenInDate).toLocaleDateString("de-DE")
               : "—"
           }
           sortable
@@ -85,7 +97,7 @@ export default function LogTable() {
           header="Freigelassen am"
           body={(rowData) =>
             rowData.letFreeDate
-              ? rowData.letFreeDate.toLocaleDateString("de-DE")
+              ? new Date(rowData.letFreeDate).toLocaleDateString("de-DE")
               : "—"
           }
           sortable
@@ -95,7 +107,7 @@ export default function LogTable() {
           header="Verstorben am"
           body={(rowData) =>
             rowData.diedDate
-              ? rowData.diedDate.toLocaleDateString("de-DE")
+              ? new Date(rowData.diedDate).toLocaleDateString("de-DE")
               : "—"
           }
           sortable
@@ -105,7 +117,7 @@ export default function LogTable() {
           header="Euthanasie am"
           body={(rowData) =>
             rowData.euthanasiaDate
-              ? rowData.euthanasiaDate.toLocaleDateString("de-DE")
+              ? new Date(rowData.euthanasiaDate).toLocaleDateString("de-DE")
               : "—"
           }
           sortable
