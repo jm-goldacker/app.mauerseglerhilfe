@@ -10,7 +10,7 @@ import {
   AutoCompleteCompleteEvent,
 } from "primereact/autocomplete";
 import apiRequest from "@/core/apiClient";
-import { spec } from "node:test/reporters";
+import { useSession } from "next-auth/react";
 
 type Props = {
   onAdd: (entry: LogEntry) => void;
@@ -37,6 +37,8 @@ const AddLogForm: FC<Props> = ({ onAdd }) => {
   const [letFreeDate, setLetFreeDate] = useState<Date>();
   const [diedDate, setDiedDate] = useState<Date>();
   const [euthanasiaDate, setEuthanasiaDate] = useState<Date>();
+
+  const session = useSession();
 
   useEffect(() => {
     const getBirdSpecies = async () => {
@@ -104,7 +106,7 @@ const AddLogForm: FC<Props> = ({ onAdd }) => {
       date: date,
       age: age,
       birdSpecies: selectedSpecies,
-      takenInBy: "nutzer",
+      takenInBy: session.data?.user?.name ?? "anonym",
       takenInDate: takenInDate?.toISOString(),
       zipFoundAt: zipFoundAt,
       circumstance: selectedCircumstance,
