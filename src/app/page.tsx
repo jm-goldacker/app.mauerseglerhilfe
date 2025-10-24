@@ -1,23 +1,13 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]/route";
-import Login from "@/components/Login";
-import Logout from "@/components/Logout";
+import LogTable from "@/components/LogTable";
 
-export default async function Home() {
-  const session = await getServerSession(authOptions);
-  if (session) {
-    return (
-      <div>
-        <div>Your name is {session.user?.name}</div>
-        <div>
-          <Logout />{" "}
-        </div>
-      </div>
-    );
-  }
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+console.log(`API URL: ${apiUrl}`);
+
+export default function Home() {
   return (
-    <div>
-      <Login />
-    </div>
+    <main>
+      <LogTable />
+    </main>
   );
 }
