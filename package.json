@@ -9,9 +9,12 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@react-keycloak/ssr": "^3.3.0",
     "axios": "^1.12.2",
     "dotenv": "^17.2.3",
+    "keycloak-js": "^26.2.1",
     "next": "15.5.4",
+    "next-auth": "^4.24.11",
     "primeicons": "^7.0.0",
     "primereact": "^10.9.7",
     "react": "19.1.0",
