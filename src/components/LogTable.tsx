@@ -1,13 +1,8 @@
 "use client"; // Wichtig: PrimeReact-Komponenten müssen auf der Client-Seite gerendert werden
 
-import React, { FC, useEffect, useState } from "react";
-import {
-  DataTable,
-  DataTableRowEditCompleteEvent,
-  DataTableRowEditEvent,
-} from "primereact/datatable";
+import React, { useEffect, useState } from "react";
+import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { InputText } from "primereact/inputtext";
 import { LogEntry } from "./types";
 import AddLogForm from "./AddLogForm";
 import { Dialog } from "primereact/dialog";
@@ -28,30 +23,6 @@ export default function LogTable() {
     getLogEntries();
   }, []);
 
-  const textEditor = (options: any) => {
-    return (
-      <InputText
-        type="text"
-        value={options.value}
-        onChange={(e) => options.editorCallback(e.target.value)}
-      />
-    );
-  };
-
-  const onRowEditComplete = (e: DataTableRowEditCompleteEvent) => {
-    let _products = [...logEntries];
-    let { newData, index } = e;
-
-    _products[index] = newData as LogEntry;
-
-    setLogEntries(_products);
-  };
-
-  const onRowEditInit = (e: DataTableRowEditEvent) => {
-    setEditEntry(e.data as LogEntry);
-    setDialogVisible(true);
-  };
-
   async function addNewEntry(newEntry: LogEntry): Promise<void> {
     if (!editEntry) {
       await apiRequest("api/LogEntries", "POST", newEntry);
@@ -67,6 +38,33 @@ export default function LogTable() {
   const hideDialog = () => {
     if (!dialogVisible) return;
     setDialogVisible(false);
+    setEditEntry(undefined);
+  };
+
+  const editBodyTemplate = (logEntry: LogEntry) => {
+    return (
+      <Button
+        onClick={() => {
+          setEditEntry(logEntry);
+          setDialogVisible(true);
+        }}
+      >
+        Bearbeiten
+      </Button>
+    );
+  };
+
+  const deleteBodyTemplate = (logEntry: LogEntry) => {
+    return (
+      <Button
+        onClick={async () => {
+          await apiRequest("/api/LogEntries/" + logEntry.id, "DELETE");
+          await getLogEntries();
+        }}
+      >
+        Löschen
+      </Button>
+    );
   };
 
   return (
@@ -79,15 +77,8 @@ export default function LogTable() {
         value={logEntries}
         tableStyle={{ minWidth: "50rem" }}
         editMode="row"
-        onRowEditComplete={onRowEditComplete}
-        onRowEditInit={onRowEditInit}
       >
-        <Column
-          field="id"
-          header="ID"
-          sortable
-          editor={(options) => textEditor(options)}
-        />
+        <Column field="id" header="ID" sortable />
         <Column
           field="date"
           header="Erfassungsdatum"
@@ -140,11 +131,8 @@ export default function LogTable() {
           }
           sortable
         />
-        <Column
-          rowEditor
-          headerStyle={{ width: "10%", minWidth: "8rem" }}
-          bodyStyle={{ textAlign: "center" }}
-        />
+        <Column header="Bearbeiten" body={editBodyTemplate} />
+        <Column header="Löschen" body={deleteBodyTemplate} />
       </DataTable>
 
       <Button onClick={() => setDialogVisible(true)} visible={!dialogVisible}>

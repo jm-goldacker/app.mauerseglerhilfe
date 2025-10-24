@@ -5,12 +5,9 @@ import { InputMask } from "primereact/inputmask";
 import { InputText } from "primereact/inputtext";
 import { Age, BirdSpecies, Circumstance, LogEntry } from "./types";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
-import {
-  AutoComplete,
-  AutoCompleteCompleteEvent,
-} from "primereact/autocomplete";
 import apiRequest from "@/core/apiClient";
 import { useSession } from "next-auth/react";
+import SpeciesAutoComplete from "./AutoComplete";
 
 type Props = {
   onAdd: (entry: LogEntry) => void;
@@ -26,15 +23,11 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
     editEntry?.birdSpecies,
   );
   const [allSpecies, setAllSpecies] = useState<string[]>([]);
-  const [speciesSuggestion, setSpeciesSuggestion] = useState<string[]>([]);
 
   const [selectedCircumstance, setSelectedCircumstance] = useState<
     string | undefined
   >(editEntry?.circumstance);
   const [allCircumstances, setCircumstances] = useState<string[]>([]);
-  const [circumstanceSuggestions, setCircumstanceSuggestions] = useState<
-    string[]
-  >([]);
 
   const [takenInDate, setTakenInDate] = useState<Date | undefined>(
     editEntry?.takenInDate ?? undefined,
@@ -74,48 +67,6 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
     getBirdSpecies();
     getCircumstances();
   }, []);
-
-  const searchSpecies = (event: AutoCompleteCompleteEvent) => {
-    setSpeciesSuggestion(
-      allSpecies.filter((s) =>
-        s.toLowerCase().includes(event.query.toLowerCase()),
-      ),
-    );
-  };
-
-  const searchCircumstances = (event: AutoCompleteCompleteEvent) => {
-    setCircumstanceSuggestions(
-      allCircumstances.filter((c) =>
-        c.toLowerCase().includes(event.query.toLowerCase()),
-      ),
-    );
-  };
-
-  const autoCompleteSpecies = () => {
-    if (!selectedSpecies) return;
-
-    var exisitingSpecies = allSpecies.find((species) =>
-      species.toLowerCase().includes(selectedSpecies.toLowerCase()),
-    );
-
-    if (exisitingSpecies) {
-      setSelectedSpecies(exisitingSpecies);
-    }
-  };
-
-  const autoCompleteCircumstance = () => {
-    if (!selectedCircumstance) return;
-
-    var existingCircumstance = allCircumstances.find((c) =>
-      c.toLowerCase().includes(selectedCircumstance.toLowerCase()),
-    );
-
-    if (existingCircumstance) {
-      setSelectedCircumstance(existingCircumstance);
-    } else {
-      setSelectedCircumstance(undefined);
-    }
-  };
 
   const addEntry = () => {
     if (!selectedSpecies || !selectedCircumstance) return;
@@ -171,13 +122,10 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
           Art
         </label>
 
-        <AutoComplete
+        <SpeciesAutoComplete
           value={selectedSpecies}
-          suggestions={speciesSuggestion}
-          completeMethod={searchSpecies}
-          onChange={(e) => setSelectedSpecies(e.value)}
-          onBlur={autoCompleteSpecies}
-          dropdown
+          allValues={allSpecies}
+          onSelected={(selected) => setSelectedSpecies(selected)}
         />
       </div>
       <div className="flex-auto">
@@ -212,13 +160,10 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
           Beschreibung
         </label>
 
-        <AutoComplete
+        <SpeciesAutoComplete
           value={selectedCircumstance}
-          suggestions={circumstanceSuggestions}
-          completeMethod={searchCircumstances}
-          onChange={(e) => setSelectedCircumstance(e.value)}
-          onBlur={autoCompleteCircumstance}
-          dropdown
+          allValues={allCircumstances}
+          onSelected={(selected) => setSelectedCircumstance(selected)}
         />
       </div>
       <div className="flex-auto">
