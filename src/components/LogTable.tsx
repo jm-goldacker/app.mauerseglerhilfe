@@ -8,11 +8,16 @@ import AddLogForm from "./AddLogForm";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import apiRequest from "@/core/apiClient";
+import { useSession } from "next-auth/react";
 
 export default function LogTable() {
   const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
   const [editEntry, setEditEntry] = useState<LogEntry>();
   const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+  const { data: session } = useSession();
+  const isAdmin = () => {
+    return session?.user.realmRoles.includes("manager");
+  };
 
   const getLogEntries = async () => {
     const data = await apiRequest<LogEntry[]>("/api/LogEntries", "GET");
@@ -132,7 +137,8 @@ export default function LogTable() {
           sortable
         />
         <Column header="Bearbeiten" body={editBodyTemplate} />
-        <Column header="Löschen" body={deleteBodyTemplate} />
+
+        {isAdmin() && <Column header="Löschen" body={deleteBodyTemplate} />}
       </DataTable>
 
       <Button onClick={() => setDialogVisible(true)} visible={!dialogVisible}>

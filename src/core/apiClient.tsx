@@ -15,9 +15,6 @@ const apiRequest = async function <T>(
   method: "GET" | "POST" | "PUT" | "DELETE",
   data?: any,
 ): Promise<T> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-  console.log(`API URL2: ${apiUrl}`);
   const response: AxiosResponse<T> = await apiClient({
     method,
     url,
