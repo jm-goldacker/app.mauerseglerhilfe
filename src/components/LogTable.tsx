@@ -73,7 +73,7 @@ export default function LogTable() {
   };
 
   return (
-    <div className="card">
+    <div>
       <Dialog onHide={hideDialog} visible={dialogVisible}>
         <AddLogForm onAdd={addNewEntry} editEntry={editEntry} />
       </Dialog>
@@ -141,9 +141,11 @@ export default function LogTable() {
         {isAdmin() && <Column header="Löschen" body={deleteBodyTemplate} />}
       </DataTable>
 
-      <Button onClick={() => setDialogVisible(true)} visible={!dialogVisible}>
-        Eintrag hinzufügen
-      </Button>
+      <div className="m-3">
+        <Button onClick={() => setDialogVisible(true)} visible={!dialogVisible}>
+          Eintrag hinzufügen
+        </Button>
+      </div>
     </div>
   );
 }

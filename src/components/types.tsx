@@ -18,6 +18,7 @@ export type BirdSpecies = {
 };
 
 export type Circumstance = {
+  id: number;
   name: string;
 };
 
