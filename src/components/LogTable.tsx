@@ -14,25 +14,35 @@ export default function LogTable() {
   const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
   const [editEntry, setEditEntry] = useState<LogEntry>();
   const [dialogVisible, setDialogVisible] = useState<boolean>(false);
-  const { data: session } = useSession();
+  const { data: session } = useSession({ required: true });
   const isAdmin = () => {
     return session?.user.realmRoles.includes("manager");
   };
 
   const getLogEntries = async () => {
-    const data = await apiRequest<LogEntry[]>("/api/LogEntries", "GET");
+    if (!session) return;
+    const data = await apiRequest<LogEntry[]>(
+      "/api/LogEntries",
+      "GET",
+      session?.token,
+    );
     setLogEntries(data);
   };
 
   useEffect(() => {
     getLogEntries();
-  }, []);
+  }, [session]);
 
   async function addNewEntry(newEntry: LogEntry): Promise<void> {
     if (!editEntry) {
-      await apiRequest("api/LogEntries", "POST", newEntry);
+      await apiRequest("api/LogEntries", "POST", session?.token, newEntry);
     } else {
-      await apiRequest("api/LogEntries/" + newEntry.id, "PUT", newEntry);
+      await apiRequest(
+        "api/LogEntries/" + newEntry.id,
+        "PUT",
+        session?.token,
+        newEntry,
+      );
       setEditEntry(undefined);
     }
 
@@ -63,7 +73,11 @@ export default function LogTable() {
     return (
       <Button
         onClick={async () => {
-          await apiRequest("/api/LogEntries/" + logEntry.id, "DELETE");
+          await apiRequest(
+            "/api/LogEntries/" + logEntry.id,
+            "DELETE",
+            session?.token,
+          );
           await getLogEntries();
         }}
       >

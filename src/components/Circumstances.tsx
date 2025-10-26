@@ -5,13 +5,20 @@ import apiRequest from "@/core/apiClient";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import React from "react";
+import { useSession } from "next-auth/react";
 
 export default function Circumstances() {
   const [circumstances, setCircumstances] = useState<Circumstance[]>([]);
   const [newCircumstance, setNewCirumstance] = useState<string>("");
 
+  const session = useSession();
+
   const getCircumstances = async () => {
-    const data = await apiRequest<Circumstance[]>("/api/Circumstances", "GET");
+    const data = await apiRequest<Circumstance[]>(
+      "/api/Circumstances",
+      "GET",
+      session.data?.token,
+    );
     setCircumstances(data);
   };
 
@@ -20,14 +27,19 @@ export default function Circumstances() {
   }, []);
 
   const deleteCircumstance = async (id: number) => {
-    await apiRequest("/api/Circumstances/" + id, "DELETE");
+    await apiRequest("/api/Circumstances/" + id, "DELETE", session.data?.token);
     await getCircumstances();
   };
 
   const addCircumstance = async () => {
-    await apiRequest<{ name: string }>("/api/Circumstances", "POST", {
-      name: newCircumstance,
-    });
+    (await apiRequest<{ name: string }>(
+      "/api/Circumstances",
+      "POST",
+      session.data?.token,
+    ),
+      {
+        name: newCircumstance,
+      });
     await getCircumstances();
   };
 

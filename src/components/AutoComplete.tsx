@@ -1,4 +1,3 @@
-import apiRequest from "@/core/apiClient";
 import {
   AutoComplete,
   AutoCompleteCompleteEvent,

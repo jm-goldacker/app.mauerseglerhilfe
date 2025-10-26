@@ -17,6 +17,7 @@ export const authOptions: AuthOptions = {
         );
         token.realmRoles = decodedToken.realm_access?.roles || [];
         token.resourceRoles = decodedToken.resource_access || {};
+        token.access_token = account.access_token;
       }
       return token;
     },
@@ -25,6 +26,7 @@ export const authOptions: AuthOptions = {
       session.user.realmRoles = token.realmRoles;
       session.user.resourceRoles = token.resourceRoles;
       session.user.name = token.name;
+      session.token = token.access_token;
       return session;
     },
   },
@@ -40,6 +42,7 @@ declare module "next-auth" {
       realmRoles: string[];
       resourceRoles: Record<string, { roles: string[] }>;
     };
+    token: string;
   }
 
   interface User {

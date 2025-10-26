@@ -48,11 +48,15 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
     editEntry?.euthanasiaDate,
   );
 
-  const session = useSession();
+  const session = useSession({ required: true });
 
   useEffect(() => {
     const getBirdSpecies = async () => {
-      const data = await apiRequest<BirdSpecies[]>("/api/BirdSpecies", "GET");
+      const data = await apiRequest<BirdSpecies[]>(
+        "/api/BirdSpecies",
+        "GET",
+        session.data?.token,
+      );
       setAllSpecies(data.map((s) => s.name));
     };
 
@@ -60,6 +64,7 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
       const data = await apiRequest<Circumstance[]>(
         "/api/Circumstances",
         "GET",
+        session.data?.token,
       );
       setCircumstances(data.map((c) => c.name));
     };
