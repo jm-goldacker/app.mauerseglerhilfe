@@ -11,11 +11,11 @@ const apiClient = (token?: string) =>
   });
 
 // Define a generic API function
-const apiRequest = async function <T>(
+const apiRequest = async function <T, D = unknown>(
   url: string,
   method: "GET" | "POST" | "PUT" | "DELETE",
   token?: string,
-  data?: any,
+  data?: D,
 ): Promise<T> {
   const response: AxiosResponse<T> = await apiClient(token)({
     method,

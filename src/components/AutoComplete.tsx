@@ -18,7 +18,7 @@ const SpeciesAutoComplete: FC<Props> = ({ value, allValues, onSelected }) => {
 
   useEffect(() => {
     onSelected(selectedSpecies);
-  }, [selectedSpecies]);
+  }, [selectedSpecies, onSelected]);
 
   const searchSpecies = (event: AutoCompleteCompleteEvent) => {
     setSpeciesSuggestion(
@@ -31,7 +31,7 @@ const SpeciesAutoComplete: FC<Props> = ({ value, allValues, onSelected }) => {
   const autoCompleteSpecies = () => {
     if (!selectedSpecies) return;
 
-    var exisitingSpecies = allValues.find((species) =>
+    const exisitingSpecies = allValues.find((species) =>
       species.toLowerCase().includes(selectedSpecies.toLowerCase()),
     );
 

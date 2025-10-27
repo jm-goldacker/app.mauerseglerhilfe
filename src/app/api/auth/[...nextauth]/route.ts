@@ -1,48 +1,41 @@
-import NextAuth, { AuthOptions } from "next-auth";
+import NextAuth, {
+  Account,
+  AuthOptions,
+  Profile,
+  Session,
+  User,
+} from "next-auth";
+import { JWT } from "next-auth/jwt";
 import KeycloakProvider from "next-auth/providers/keycloak";
-export const authOptions: AuthOptions = {
-  providers: [
-    KeycloakProvider({
-      clientId: process.env.KEYCLOAK_CLIENT_ID,
-      clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
-      issuer: process.env.KEYCLOAK_ISSUER,
-    }),
-  ],
-  callbacks: {
-    async jwt({ token, account }: any) {
-      // Füge die Rollen aus dem JWT-Token zum token-Objekt hinzu
-      if (account?.access_token) {
-        const decodedToken = JSON.parse(
-          Buffer.from(account.access_token.split(".")[1], "base64").toString(),
-        );
-        token.realmRoles = decodedToken.realm_access?.roles || [];
-        token.resourceRoles = decodedToken.resource_access || {};
-        token.access_token = account.access_token;
-      }
-      return token;
-    },
-    async session({ session, token }: any) {
-      // Übertrage die Rollen in die Session
-      session.user.realmRoles = token.realmRoles;
-      session.user.resourceRoles = token.resourceRoles;
-      session.user.name = token.name;
-      session.token = token.access_token;
-      return session;
-    },
-  },
-};
 
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+interface KeycloakAccount extends Account {
+  access_token?: string;
+}
+
+interface KeycloakToken extends JWT {
+  name?: string | null;
+  realmRoles?: string[];
+  resourceRoles?: Record<string, { roles: string[] }>;
+  access_token?: string;
+}
+
+interface KeycloakSession extends Session {
+  user?: {
+    name?: string | null;
+    realmRoles?: string[];
+    resourceRoles?: Record<string, { roles: string[] }>;
+  };
+  token?: string;
+}
 
 declare module "next-auth" {
   interface Session {
-    user: {
-      name: string;
-      realmRoles: string[];
-      resourceRoles: Record<string, { roles: string[] }>;
+    user?: {
+      name?: string | null;
+      realmRoles?: string[];
+      resourceRoles?: Record<string, { roles: string[] }>;
     };
-    token: string;
+    token?: string;
   }
 
   interface User {
@@ -57,3 +50,53 @@ declare module "next-auth" {
     resourceRoles: Record<string, { roles: string[] }>;
   }
 }
+
+export const authOptions: AuthOptions = {
+  providers: [
+    KeycloakProvider({
+      clientId: process.env.KEYCLOAK_CLIENT_ID,
+      clientSecret: process.env.KEYCLOAK_CLIENT_SECRET,
+      issuer: process.env.KEYCLOAK_ISSUER,
+    }),
+  ],
+  callbacks: {
+    async jwt({
+      token,
+      account,
+    }: {
+      token: KeycloakToken;
+      user?: User;
+      account?: KeycloakAccount | null;
+      profile?: Profile;
+      isNewUser?: boolean;
+    }): Promise<KeycloakToken> {
+      // Füge die Rollen aus dem JWT-Token zum token-Objekt hinzu
+      if (account?.access_token) {
+        const decodedToken = JSON.parse(
+          Buffer.from(account.access_token.split(".")[1], "base64").toString(),
+        );
+        token.realmRoles = decodedToken.realm_access?.roles || [];
+        token.resourceRoles = decodedToken.resource_access || {};
+        token.access_token = account.access_token;
+      }
+      return token;
+    },
+    async session({
+      session,
+      token,
+    }: {
+      session: KeycloakSession;
+      token: KeycloakToken;
+    }): Promise<KeycloakSession> {
+      // Übertrage die Rollen in die Session
+      session.user!.realmRoles = token.realmRoles;
+      session.user!.resourceRoles = token.resourceRoles;
+      session.user!.name = token.name;
+      session.token = token.access_token;
+      return session;
+    },
+  },
+};
+
+const handler = NextAuth(authOptions);
+export { handler as GET, handler as POST };

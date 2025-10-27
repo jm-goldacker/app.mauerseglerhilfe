@@ -71,7 +71,7 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
 
     getBirdSpecies();
     getCircumstances();
-  }, []);
+  }, [session.data?.token]);
 
   const addEntry = () => {
     if (!selectedSpecies || !selectedCircumstance) return;

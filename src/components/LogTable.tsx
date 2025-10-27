@@ -16,7 +16,7 @@ export default function LogTable() {
   const [dialogVisible, setDialogVisible] = useState<boolean>(false);
   const { data: session } = useSession({ required: true });
   const isAdmin = () => {
-    return session?.user.realmRoles.includes("manager");
+    return session?.user?.realmRoles?.includes("manager");
   };
 
   const getLogEntries = async () => {
