@@ -17,6 +17,9 @@ interface KeycloakToken extends JWT {
   realmRoles?: string[];
   resourceRoles?: Record<string, { roles: string[] }>;
   access_token?: string;
+  refresh_token?: string;
+  expires_at?: number;
+  id_token?: string;
 }
 
 interface KeycloakSession extends Session {
@@ -26,6 +29,7 @@ interface KeycloakSession extends Session {
     resourceRoles?: Record<string, { roles: string[] }>;
   };
   token?: string;
+  id_token?: string;
 }
 
 declare module "next-auth" {
@@ -36,6 +40,7 @@ declare module "next-auth" {
       resourceRoles?: Record<string, { roles: string[] }>;
     };
     token?: string;
+    id_token?: string;
   }
 
   interface User {
@@ -59,6 +64,9 @@ export const authOptions: AuthOptions = {
       issuer: process.env.KEYCLOAK_ISSUER,
     }),
   ],
+  session: {
+    strategy: "jwt",
+  },
   callbacks: {
     async jwt({
       token,
@@ -78,7 +86,70 @@ export const authOptions: AuthOptions = {
         token.realmRoles = decodedToken.realm_access?.roles || [];
         token.resourceRoles = decodedToken.resource_access || {};
         token.access_token = account.access_token;
+        token.expires_at = decodedToken.exp;
       }
+
+      if (account?.refresh_token) {
+        token.refresh_token = account.refresh_token;
+      }
+
+      if (account?.id_token) {
+        token.id_token = account.id_token;
+      }
+
+      // Token-Refresh-Logik: Prüfe, ob das access_token abgelaufen ist
+      const now = Math.floor(Date.now() / 1000);
+      if (token.expires_at && now < token.expires_at) {
+        // Token ist noch gültig
+        return token;
+      }
+
+      // Token ist abgelaufen: Versuche, es zu refreshen
+      if (token.refresh_token) {
+        try {
+          const response = await fetch(
+            `${process.env.KEYCLOAK_ISSUER}/protocol/openid-connect/token`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: new URLSearchParams({
+                client_id: process.env.KEYCLOAK_CLIENT_ID!,
+                client_secret: process.env.KEYCLOAK_CLIENT_SECRET!,
+                grant_type: "refresh_token",
+                refresh_token: token.refresh_token,
+              }),
+            },
+          );
+
+          const refreshedTokens = await response.json();
+
+          if (!response.ok) {
+            throw refreshedTokens;
+          }
+
+          // Aktualisiere das access_token und refresh_token
+          token.access_token = refreshedTokens.access_token;
+          token.refresh_token =
+            refreshedTokens.refresh_token || token.refresh_token;
+          const decodedToken = JSON.parse(
+            Buffer.from(
+              refreshedTokens.access_token.split(".")[1],
+              "base64",
+            ).toString(),
+          );
+          token.expires_at = decodedToken.exp;
+        } catch (error) {
+          console.error("Fehler beim Token-Refresh:", error);
+          // Falls der Refresh fehlschlägt, setze das Token als abgelaufen
+          token.expires_at = 0;
+        }
+      } else {
+        // Kein refresh_token vorhanden: Token ist ungültig
+        token.expires_at = 0;
+      }
+
       return token;
     },
     async session({
@@ -93,6 +164,7 @@ export const authOptions: AuthOptions = {
       session.user!.resourceRoles = token.resourceRoles;
       session.user!.name = token.name;
       session.token = token.access_token;
+      session.id_token = token.id_token;
       return session;
     },
   },
