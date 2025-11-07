@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Circumstance } from "./types";
-import apiRequest from "@/core/apiClient";
+import { Circumstance } from "../types";
+import apiRequest from "@/lib/apiClient";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import React from "react";

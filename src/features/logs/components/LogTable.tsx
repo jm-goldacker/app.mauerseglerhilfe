@@ -3,11 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { LogEntry } from "./types";
+import { LogEntry } from "../types";
 import AddLogForm from "./AddLogForm";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-import apiRequest from "@/core/apiClient";
+import apiRequest from "@/lib/apiClient";
 import { useSession } from "next-auth/react";
 
 export default function LogTable() {

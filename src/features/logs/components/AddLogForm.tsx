@@ -3,11 +3,12 @@ import { Button } from "primereact/button";
 import { Calendar } from "primereact/calendar";
 import { InputMask } from "primereact/inputmask";
 import { InputText } from "primereact/inputtext";
-import { Age, BirdSpecies, Circumstance, LogEntry } from "./types";
+import { Age, BirdSpecies, LogEntry } from "../types";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
-import apiRequest from "@/core/apiClient";
+import apiRequest from "@/lib/apiClient";
 import { useSession } from "next-auth/react";
-import SpeciesAutoComplete from "./AutoComplete";
+import SpeciesAutoComplete from "@/components/AutoComplete";
+import { Circumstance } from "@/features/circumstances/types";
 
 type Props = {
   onAdd: (entry: LogEntry) => void;

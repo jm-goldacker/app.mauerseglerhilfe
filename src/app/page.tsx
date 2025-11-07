@@ -1,12 +1,12 @@
 "use client";
 
-import Circumstances from "@/components/Circumstances";
-import LogTable from "@/components/LogTable";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import React from "react";
 import { useState } from "react";
 import { signOut, useSession } from "next-auth/react";
+import LogTable from "@/features/logs/components/LogTable";
+import Circumstances from "@/features/circumstances/components/Circumstances";
 
 export default function Home() {
   const [circumstancesDialogVisible, setCircumstancesDialogVisible] =

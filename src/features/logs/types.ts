@@ -17,9 +17,4 @@ export type BirdSpecies = {
   name: string;
 };
 
-export type Circumstance = {
-  id: number;
-  name: string;
-};
-
 export type Age = "Küken" | "Jungtier" | "Ausgewachsen";
