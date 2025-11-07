@@ -32,12 +32,7 @@ export default function Circumstances() {
   };
 
   const addCircumstance = async () => {
-    await (apiRequest<{ name: string }>(
-      "/api/Circumstances",
-      "POST",
-      session.data?.token,
-    ),
-    {
+    await apiRequest("/api/Circumstances", "POST", session.data?.token, {
       name: newCircumstance,
     });
     await getCircumstances();
