@@ -23,6 +23,8 @@ export default function Home() {
       post_logout_redirect_uri: `${window.location.origin}/`, // Zurück zur Startseite
     });
 
+    console.log(`${keycloakLogoutUrl}?${logoutParams.toString()}`);
+
     await signOut({ redirect: false }); // Beende nur die lokale Session
     window.location.href = `${keycloakLogoutUrl}?${logoutParams.toString()}`;
   };
