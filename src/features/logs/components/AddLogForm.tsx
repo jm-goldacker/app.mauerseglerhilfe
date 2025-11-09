@@ -132,6 +132,7 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
           value={selectedSpecies}
           allValues={allSpecies}
           onSelected={(selected) => setSelectedSpecies(selected)}
+          useOnlyPredefinedValues={false}
         />
       </div>
       <div className="flex-auto">
@@ -170,6 +171,7 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
           value={selectedCircumstance}
           allValues={allCircumstances}
           onSelected={(selected) => setSelectedCircumstance(selected)}
+          useOnlyPredefinedValues={true}
         />
       </div>
       <div className="flex-auto">

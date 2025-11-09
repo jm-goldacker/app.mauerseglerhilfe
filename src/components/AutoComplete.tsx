@@ -8,9 +8,15 @@ type Props = {
   value: string | undefined;
   allValues: string[];
   onSelected: (s: string | undefined) => void;
+  useOnlyPredefinedValues: boolean;
 };
 
-const SpeciesAutoComplete: FC<Props> = ({ value, allValues, onSelected }) => {
+const SpeciesAutoComplete: FC<Props> = ({
+  value,
+  allValues,
+  onSelected,
+  useOnlyPredefinedValues,
+}) => {
   const [selectedSpecies, setSelectedSpecies] = useState<string | undefined>(
     value,
   );
@@ -28,7 +34,7 @@ const SpeciesAutoComplete: FC<Props> = ({ value, allValues, onSelected }) => {
     );
   };
 
-  const autoCompleteSpecies = () => {
+  const autoCompleteSpecies = (currentText: string) => {
     if (!selectedSpecies) return;
 
     const exisitingSpecies = allValues.find((species) =>
@@ -37,8 +43,10 @@ const SpeciesAutoComplete: FC<Props> = ({ value, allValues, onSelected }) => {
 
     if (exisitingSpecies) {
       setSelectedSpecies(exisitingSpecies);
-    } else {
+    } else if (useOnlyPredefinedValues) {
       setSelectedSpecies(undefined);
+    } else {
+      setSelectedSpecies(currentText);
     }
   };
 
@@ -48,7 +56,7 @@ const SpeciesAutoComplete: FC<Props> = ({ value, allValues, onSelected }) => {
       suggestions={speciesSuggestion}
       completeMethod={searchSpecies}
       onChange={(e) => setSelectedSpecies(e.value)}
-      onBlur={autoCompleteSpecies}
+      onBlur={(e) => autoCompleteSpecies(e.target.value)}
       dropdown
     />
   );
