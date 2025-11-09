@@ -13,8 +13,4 @@ export type LogEntry = {
   euthanasiaDate: Date | undefined;
 };
 
-export type BirdSpecies = {
-  name: string;
-};
-
 export type Age = "Küken" | "Jungtier" | "Ausgewachsen";
