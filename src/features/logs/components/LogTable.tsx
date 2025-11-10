@@ -49,92 +49,96 @@ export default function LogTable() {
   return (
     <div>
       {error && <Message severity="error" text={error} className="mb-3" />}
-      <Dialog onHide={hideDialog} visible={dialogVisible}>
-        <AddLogForm
-          onAdd={(entry) => {
-            !editEntry ? addLog(entry) : updateLog(entry);
-            hideDialog();
-          }}
-          editEntry={editEntry}
-        />
-      </Dialog>
-
       {loading ? (
         <div className="flex justify-center">
           <ProgressSpinner />
         </div>
       ) : (
-        <DataTable
-          value={logEntries}
-          tableStyle={{ minWidth: "50rem" }}
-          editMode="row"
-        >
-          <Column field="id" header="ID" sortable />
-          <Column
-            field="date"
-            header="Erfassungsdatum"
-            body={(rowData) =>
-              new Date(rowData.date).toLocaleDateString("de-DE")
-            }
-            sortable
-          />
-          <Column field="birdSpecies" header="Vogelart" sortable />
-          <Column
-            field="takenInDate"
-            header="Aufnahmedatum"
-            body={(rowData) =>
-              rowData.takenInDate
-                ? new Date(rowData.takenInDate).toLocaleDateString("de-DE")
-                : "—"
-            }
-            sortable
-          />
-          <Column field="age" header="Alter" sortable />
-          <Column field="takenInBy" header="Aufgenommen von" sortable />
-          <Column field="zipFoundAt" header="Fundort (PLZ)" sortable />
-          <Column field="description" header="Beschreibung" sortable />
-          <Column field="redirectedTo" header="Weitergeleitet an" sortable />
-          <Column
-            field="letFreeDate"
-            header="Freigelassen am"
-            body={(rowData) =>
-              rowData.letFreeDate
-                ? new Date(rowData.letFreeDate).toLocaleDateString("de-DE")
-                : "—"
-            }
-            sortable
-          />
-          <Column
-            field="diedDate"
-            header="Verstorben am"
-            body={(rowData) =>
-              rowData.diedDate
-                ? new Date(rowData.diedDate).toLocaleDateString("de-DE")
-                : "—"
-            }
-            sortable
-          />
-          <Column
-            field="euthanasiaDate"
-            header="Euthanasie am"
-            body={(rowData) =>
-              rowData.euthanasiaDate
-                ? new Date(rowData.euthanasiaDate).toLocaleDateString("de-DE")
-                : "—"
-            }
-            sortable
-          />
-          <Column header="Bearbeiten" body={editBodyTemplate} />
+        <div>
+          <Dialog onHide={hideDialog} visible={dialogVisible}>
+            <AddLogForm
+              onAdd={(entry) => {
+                !editEntry ? addLog(entry) : updateLog(entry);
+                hideDialog();
+              }}
+              editEntry={editEntry}
+            />
+          </Dialog>
+          <DataTable
+            value={logEntries}
+            tableStyle={{ minWidth: "50rem" }}
+            editMode="row"
+          >
+            <Column field="id" header="ID" sortable />
+            <Column
+              field="date"
+              header="Erfassungsdatum"
+              body={(rowData) =>
+                new Date(rowData.date).toLocaleDateString("de-DE")
+              }
+              sortable
+            />
+            <Column field="birdSpecies" header="Vogelart" sortable />
+            <Column
+              field="takenInDate"
+              header="Aufnahmedatum"
+              body={(rowData) =>
+                rowData.takenInDate
+                  ? new Date(rowData.takenInDate).toLocaleDateString("de-DE")
+                  : "—"
+              }
+              sortable
+            />
+            <Column field="age" header="Alter" sortable />
+            <Column field="takenInBy" header="Aufgenommen von" sortable />
+            <Column field="zipFoundAt" header="Fundort (PLZ)" sortable />
+            <Column field="description" header="Beschreibung" sortable />
+            <Column field="redirectedTo" header="Weitergeleitet an" sortable />
+            <Column
+              field="letFreeDate"
+              header="Freigelassen am"
+              body={(rowData) =>
+                rowData.letFreeDate
+                  ? new Date(rowData.letFreeDate).toLocaleDateString("de-DE")
+                  : "—"
+              }
+              sortable
+            />
+            <Column
+              field="diedDate"
+              header="Verstorben am"
+              body={(rowData) =>
+                rowData.diedDate
+                  ? new Date(rowData.diedDate).toLocaleDateString("de-DE")
+                  : "—"
+              }
+              sortable
+            />
+            <Column
+              field="euthanasiaDate"
+              header="Euthanasie am"
+              body={(rowData) =>
+                rowData.euthanasiaDate
+                  ? new Date(rowData.euthanasiaDate).toLocaleDateString("de-DE")
+                  : "—"
+              }
+              sortable
+            />
+            <Column header="Bearbeiten" body={editBodyTemplate} />
 
-          {isAdmin() && <Column header="Löschen" body={deleteBodyTemplate} />}
-        </DataTable>
+            {isAdmin() && <Column header="Löschen" body={deleteBodyTemplate} />}
+          </DataTable>
+
+          <div className="m-3">
+            <Button
+              onClick={() => setDialogVisible(true)}
+              visible={!dialogVisible}
+            >
+              Eintrag hinzufügen
+            </Button>
+          </div>
+        </div>
       )}
-
-      <div className="m-3">
-        <Button onClick={() => setDialogVisible(true)} visible={!dialogVisible}>
-          Eintrag hinzufügen
-        </Button>
-      </div>
     </div>
   );
 }
