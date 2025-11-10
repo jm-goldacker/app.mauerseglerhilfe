@@ -17,12 +17,14 @@ export default function Home() {
 
   return (
     <main>
-      <div>
-        Willkommen {session.data?.user?.name}
-        <Button className="m-3" onClick={handleLogout}>
-          Logout
-        </Button>
-      </div>
+      {session.data && (
+        <div className="flex items-center gap-4 m-3">
+          <p>Willkommen {session.data.user?.name}</p>
+          <Button onClick={() => handleLogout(session.data.id_token)}>
+            Logout
+          </Button>
+        </div>
+      )}
 
       <Dialog
         onHide={() => setCircumstancesDialogVisible(false)}
