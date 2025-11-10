@@ -1,3 +1,4 @@
+import { handleLogout } from "@/lib/logout";
 import NextAuth, {
   Account,
   AuthOptions,
@@ -142,12 +143,13 @@ export const authOptions: AuthOptions = {
           token.expires_at = decodedToken.exp;
         } catch (error) {
           console.error("Fehler beim Token-Refresh:", error);
-          // Falls der Refresh fehlschlägt, setze das Token als abgelaufen
           token.expires_at = 0;
+          handleLogout();
         }
       } else {
         // Kein refresh_token vorhanden: Token ist ungültig
         token.expires_at = 0;
+        handleLogout();
       }
 
       return token;
