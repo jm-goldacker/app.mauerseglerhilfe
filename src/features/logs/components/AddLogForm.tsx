@@ -31,7 +31,7 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
   >(editEntry?.circumstance);
 
   const [takenInDate, setTakenInDate] = useState<Date | undefined>(
-    editEntry?.takenInDate ?? undefined,
+    editEntry?.takenInDate ? new Date(editEntry.takenInDate) : undefined,
   );
   const [zipFoundAt, setZipFoundAt] = useState<string | undefined>(
     editEntry?.zipFoundAt,
@@ -40,13 +40,13 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
     editEntry?.redirectedTo,
   );
   const [letFreeDate, setLetFreeDate] = useState<Date | undefined>(
-    editEntry?.letFreeDate,
+    editEntry?.letFreeDate ? new Date(editEntry.letFreeDate) : undefined,
   );
   const [diedDate, setDiedDate] = useState<Date | undefined>(
-    editEntry?.diedDate,
+    editEntry?.diedDate ? new Date(editEntry.diedDate) : undefined,
   );
   const [euthanasiaDate, setEuthanasiaDate] = useState<Date | undefined>(
-    editEntry?.euthanasiaDate,
+    editEntry?.euthanasiaDate ? new Date(editEntry.euthanasiaDate) : undefined,
   );
 
   const session = useSession({ required: true });
@@ -105,6 +105,8 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
             </label>
 
             <Calendar
+              showButtonBar
+              dateFormat="dd.mm.yy"
               value={date}
               onChange={(e) => {
                 if (!e.value) return;
@@ -143,6 +145,8 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
             </label>
 
             <Calendar
+              showButtonBar
+              dateFormat="dd.mm.yy"
               value={takenInDate}
               onChange={(e) => {
                 if (!e.value) return;
@@ -194,6 +198,8 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
             </label>
 
             <Calendar
+              showButtonBar
+              dateFormat="dd.mm.yy"
               value={letFreeDate}
               onChange={(e) => {
                 if (!e.value) return;
@@ -207,6 +213,8 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
             </label>
 
             <Calendar
+              showButtonBar
+              dateFormat="dd.mm.yy"
               value={diedDate}
               onChange={(e) => {
                 if (!e.value) return;
@@ -220,6 +228,8 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
             </label>
 
             <Calendar
+              showButtonBar
+              dateFormat="dd.mm.yy"
               value={euthanasiaDate}
               onChange={(e) => {
                 if (!e.value) return;
