@@ -1,10 +1,9 @@
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 
-const session = useSession();
+export const handleLogout = async (idTokenHint: string | undefined) => {
+  if (!idTokenHint) return;
 
-export const handleLogout = async () => {
   const keycloakLogoutUrl = `${process.env.NEXT_PUBLIC_KEYCLOAK_ISSUER}/protocol/openid-connect/logout`;
-  const idTokenHint = session.data?.id_token ?? "";
 
   const logoutParams = new URLSearchParams({
     id_token_hint: idTokenHint,

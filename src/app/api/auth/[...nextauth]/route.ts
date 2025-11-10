@@ -144,12 +144,12 @@ export const authOptions: AuthOptions = {
         } catch (error) {
           console.error("Fehler beim Token-Refresh:", error);
           token.expires_at = 0;
-          handleLogout();
+          if (token.id_token) handleLogout(token.id_token);
         }
       } else {
         // Kein refresh_token vorhanden: Token ist ungültig
         token.expires_at = 0;
-        handleLogout();
+        if (token.id_token) handleLogout(token.id_token);
       }
 
       return token;
