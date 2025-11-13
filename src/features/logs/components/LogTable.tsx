@@ -68,16 +68,10 @@ export default function LogTable() {
             value={logEntries}
             tableStyle={{ minWidth: "50rem" }}
             editMode="row"
+            sortField="takenInDate"
+            sortOrder={-1}
           >
             <Column field="id" header="ID" sortable />
-            <Column
-              field="date"
-              header="Erfassungsdatum"
-              body={(rowData) =>
-                new Date(rowData.date).toLocaleDateString("de-DE")
-              }
-              sortable
-            />
             <Column field="birdSpecies" header="Vogelart" sortable />
             <Column
               field="takenInDate"
@@ -92,7 +86,7 @@ export default function LogTable() {
             <Column field="age" header="Alter" sortable />
             <Column field="takenInBy" header="Aufgenommen von" sortable />
             <Column field="zipFoundAt" header="Fundort (PLZ)" sortable />
-            <Column field="description" header="Beschreibung" sortable />
+            <Column field="circumstance" header="Fundumstand" sortable />
             <Column field="redirectedTo" header="Weitergeleitet an" sortable />
             <Column
               field="letFreeDate"
