@@ -17,7 +17,7 @@ export default function LogTable() {
   const [dialogVisible, setDialogVisible] = useState<boolean>(false);
   const { data: session } = useSession({ required: true });
   const isAdmin = () => {
-    return session?.user?.realmRoles?.includes("manager");
+    return session?.user?.realmRoles?.includes("manager") ?? false;
   };
 
   const { logEntries, addLog, updateLog, deleteLog, loading, error } =
@@ -30,7 +30,7 @@ export default function LogTable() {
   };
 
   const editBodyTemplate = (logEntry: LogEntry) => {
-    return (
+    return isAdmin() || logEntry.takenInBy == session?.user?.name ? (
       <Button
         onClick={() => {
           setEditEntry(logEntry);
@@ -39,11 +39,17 @@ export default function LogTable() {
       >
         Bearbeiten
       </Button>
+    ) : (
+      <div></div>
     );
   };
 
   const deleteBodyTemplate = (logEntry: LogEntry) => {
-    return <Button onClick={() => deleteLog(logEntry.id)}>Löschen</Button>;
+    return isAdmin() || logEntry.takenInBy == session?.user?.name ? (
+      <Button onClick={() => deleteLog(logEntry.id)}>Löschen</Button>
+    ) : (
+      <div></div>
+    );
   };
 
   return (
@@ -120,7 +126,7 @@ export default function LogTable() {
             />
             <Column header="Bearbeiten" body={editBodyTemplate} />
 
-            {isAdmin() && <Column header="Löschen" body={deleteBodyTemplate} />}
+            <Column header="Löschen" body={deleteBodyTemplate} />
           </DataTable>
 
           <div className="m-3">
