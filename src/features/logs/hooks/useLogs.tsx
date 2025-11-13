@@ -93,7 +93,7 @@ export const useLogs = () => {
 
   useEffect(() => {
     getLogs();
-  }, []);
+  }, [session.data?.token]);
 
   return {
     logEntries,
