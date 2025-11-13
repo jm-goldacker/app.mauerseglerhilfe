@@ -92,7 +92,13 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
       {errorSpecies && (
         <Message severity="error" text={errorSpecies} className="mb-3" />
       )}
-
+      {(!selectedCircumstance?.trim() || !selectedSpecies?.trim()) && (
+        <Message
+          severity="error"
+          text="Bitte Fundumstand und Art angeben!"
+          className="mb-3"
+        />
+      )}
       {loadingCircumstances || loadingSpecies ? (
         <div className="flex justify-center">
           <ProgressSpinner />
