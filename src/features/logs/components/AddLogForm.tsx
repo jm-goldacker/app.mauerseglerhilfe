@@ -100,11 +100,12 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
       ) : (
         <div className="grid grid-flow-row auto-rows-max">
           <div className="flex-auto">
-            <label htmlFor="buttondisplay" className="font-bold block mb-2">
+            <label htmlFor="date" className="font-bold block mb-2">
               Datum
             </label>
 
             <Calendar
+              id="date"
               showButtonBar
               dateFormat="dd.mm.yy"
               value={date}
@@ -115,11 +116,12 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
             />
           </div>
           <div className="flex-auto">
-            <label htmlFor="buttondisplay" className="font-bold block mb-2">
+            <label htmlFor="age" className="font-bold block mb-2">
               Alter
             </label>
 
             <Dropdown
+              id="age"
               value={age}
               onChange={(e: DropdownChangeEvent) => setAge(e.value)}
               options={ageOptions}
@@ -128,11 +130,12 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
             />
           </div>
           <div className="flex-auto">
-            <label htmlFor="buttondisplay" className="font-bold block mb-2">
+            <label htmlFor="species" className="font-bold block mb-2">
               Art
             </label>
 
             <SpeciesAutoComplete
+              id="species"
               value={selectedSpecies}
               allValues={allSpecies.map((s) => s.name)}
               onSelected={(selected) => setSelectedSpecies(selected)}
@@ -140,11 +143,12 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
             />
           </div>
           <div className="flex-auto">
-            <label htmlFor="buttondisplay" className="font-bold block mb-2">
+            <label htmlFor="takenInDate" className="font-bold block mb-2">
               Aufgenommen am
             </label>
 
             <Calendar
+              id="takenInDate"
               showButtonBar
               dateFormat="dd.mm.yy"
               value={takenInDate}
@@ -155,11 +159,12 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
             />
           </div>
           <div className="flex-auto">
-            <label htmlFor="buttondisplay" className="font-bold block mb-2">
+            <label htmlFor="zipCode" className="font-bold block mb-2">
               PLZ Fundort
             </label>
 
             <InputMask
+              id="zipCode"
               mask="99999"
               value={zipFoundAt}
               onChange={(e) => {
@@ -169,11 +174,12 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
             />
           </div>
           <div className="flex-auto">
-            <label htmlFor="buttondisplay" className="font-bold block mb-2">
-              Beschreibung
+            <label htmlFor="circumstances" className="font-bold block mb-2">
+              Fundumstand
             </label>
 
             <SpeciesAutoComplete
+              id="circumstances"
               value={selectedCircumstance}
               allValues={circumstances.map((c) => c.name)}
               onSelected={(selected) => setSelectedCircumstance(selected)}
@@ -181,11 +187,12 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
             />
           </div>
           <div className="flex-auto">
-            <label htmlFor="buttondisplay" className="font-bold block mb-2">
+            <label htmlFor="redirectedTo" className="font-bold block mb-2">
               Weitergeleitet an
             </label>
 
             <InputText
+              id="redirectedTo"
               placeholder={redirectedTo}
               onChange={(e) => {
                 setRedirectedTo(e.target.value);
@@ -193,11 +200,12 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
             />
           </div>
           <div className="flex-auto">
-            <label htmlFor="buttondisplay" className="font-bold block mb-2">
+            <label htmlFor="letFreeDate" className="font-bold block mb-2">
               Freigelassen am
             </label>
 
             <Calendar
+              id="letFreeDate"
               showButtonBar
               dateFormat="dd.mm.yy"
               value={letFreeDate}
@@ -208,11 +216,12 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
             />
           </div>
           <div className="flex-auto">
-            <label htmlFor="buttondisplay" className="font-bold block mb-2">
+            <label htmlFor="diedDate" className="font-bold block mb-2">
               Verstorben am
             </label>
 
             <Calendar
+              id="diedDate"
               showButtonBar
               dateFormat="dd.mm.yy"
               value={diedDate}
@@ -223,11 +232,12 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
             />
           </div>
           <div className="flex-auto">
-            <label htmlFor="buttondisplay" className="font-bold block mb-2">
+            <label htmlFor="euthanasiaDate" className="font-bold block mb-2">
               Euthanasie am
             </label>
 
             <Calendar
+              id="euthanasiaDate"
               showButtonBar
               dateFormat="dd.mm.yy"
               value={euthanasiaDate}
@@ -237,7 +247,7 @@ const AddLogForm: FC<Props> = ({ onAdd, editEntry }) => {
               }}
             />
           </div>
-          <div className="flex-auto">
+          <div className="flex-auto mt-3 mb-3">
             <Button onClick={() => addEntry()}>Add</Button>
           </div>
         </div>

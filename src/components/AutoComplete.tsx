@@ -5,6 +5,7 @@ import {
 import { FC, useEffect, useState } from "react";
 
 type Props = {
+  id: string | undefined;
   value: string | undefined;
   allValues: string[];
   onSelected: (s: string | undefined) => void;
@@ -12,6 +13,7 @@ type Props = {
 };
 
 const SpeciesAutoComplete: FC<Props> = ({
+  id,
   value,
   allValues,
   onSelected,
@@ -52,6 +54,7 @@ const SpeciesAutoComplete: FC<Props> = ({
 
   return (
     <AutoComplete
+      id={id}
       value={selectedSpecies}
       suggestions={speciesSuggestion}
       completeMethod={searchSpecies}
