@@ -1,6 +1,7 @@
 import keycloak from '../auth/keycloak'
 
-const API_BASE = 'http://localhost:5078/api'
+const env = (window as Window & { __ENV__?: Record<string, string> }).__ENV__ ?? {}
+const API_BASE = env.API_URL ?? import.meta.env.VITE_API_URL ?? 'http://localhost:5078/api'
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = keycloak.token

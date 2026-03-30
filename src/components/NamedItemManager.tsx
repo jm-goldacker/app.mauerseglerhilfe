@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { NamedItem } from '../api/types'
-import keycloak from '../auth/keycloak'
+import { hasRole } from '../auth/keycloak'
 import { PlusIcon, EditIcon, TrashIcon, CheckIcon, XIcon } from './Icons'
 
 interface Props {
@@ -16,7 +16,7 @@ interface Props {
 
 export default function NamedItemManager({ title, description, queryKey, fetchAll, create, update, remove }: Props) {
   const qc = useQueryClient()
-  const isManager = keycloak.hasRealmRole('manager')
+  const isManager = hasRole('manager')
 
   const { data = [], isLoading } = useQuery({ queryKey: [queryKey], queryFn: fetchAll })
 

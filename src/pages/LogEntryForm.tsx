@@ -6,7 +6,7 @@ import {
   serviceTypesApi, dispositionTypesApi, careStationsApi
 } from '../api/queries'
 import type { LogEntryPost } from '../api/types'
-import keycloak from '../auth/keycloak'
+import { hasRole } from '../auth/keycloak'
 import { ArrowLeftIcon, TrashIcon } from '../components/Icons'
 
 function toInputDate(d?: string) {
@@ -52,7 +52,7 @@ export default function LogEntryForm() {
   const isNew = id === 'neu'
   const navigate = useNavigate()
   const qc = useQueryClient()
-  const isManager = keycloak.hasRealmRole('manager')
+  const isManager = hasRole('manager')
 
   const [form, setForm] = useState<LogEntryPost>(DEFAULT)
   const [error, setError] = useState('')

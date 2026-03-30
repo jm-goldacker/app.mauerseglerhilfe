@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { tripLogsApi } from '../api/queries'
 import type { TripLog, TripLogPost } from '../api/types'
-import keycloak from '../auth/keycloak'
+import { hasRole } from '../auth/keycloak'
 import { PlusIcon, EditIcon, TrashIcon, XIcon, CheckIcon } from '../components/Icons'
 
 function formatDate(d: string) {
@@ -18,7 +18,7 @@ const inputCls = "w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg
 
 export default function Fahrtenbuch() {
   const qc = useQueryClient()
-  const isManager = keycloak.hasRealmRole('manager')
+  const isManager = hasRole('manager')
   const { data: trips = [], isLoading } = useQuery({ queryKey: ['tripLogs'], queryFn: tripLogsApi.getAll })
 
   const [showForm, setShowForm] = useState(false)
