@@ -3,7 +3,7 @@ services:
     image: mgoldacker/api-mauerseglerhilfe:latest
     restart: unless-stopped
     ports:
-      - "5078:8080"
+      - "127.0.0.1:5078:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
@@ -25,7 +25,7 @@ services:
     restart: unless-stopped
     command: start-dev
     ports:
-      - "8090:8080"
+      - "127.0.0.1:8090:8080"
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres-keycloak:5432/keycloak
@@ -44,7 +44,7 @@ services:
     image: postgres:14-alpine
     restart: unless-stopped
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
     environment:
       POSTGRES_DB: mauerseglerhilfe
       POSTGRES_USER: ${DB_USER}
@@ -63,7 +63,7 @@ services:
     image: postgres:14-alpine
     restart: unless-stopped
     ports:
-      - "5434:5432"
+      - "127.0.0.1:5434:5432"
     environment:
       POSTGRES_DB: keycloak
       POSTGRES_USER: keycloak
