@@ -1,0 +1,286 @@
+import { useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  logEntriesApi, birdSpeciesApi, circumstancesApi,
+  serviceTypesApi, dispositionTypesApi, careStationsApi
+} from '../api/queries'
+import type { LogEntryPost } from '../api/types'
+import keycloak from '../auth/keycloak'
+import { ArrowLeftIcon, TrashIcon } from '../components/Icons'
+
+function toInputDate(d?: string) {
+  if (!d) return ''
+  return d.substring(0, 10)
+}
+
+const DEFAULT: LogEntryPost = {
+  date: new Date().toISOString().substring(0, 10),
+  age: '',
+  birdSpecies: '',
+  circumstance: '',
+}
+
+const inputCls = "w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-violet-400 transition-colors placeholder:text-slate-300"
+const selectCls = inputCls
+
+function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <label className="block text-xs font-medium text-slate-600">
+        {label}{required && <span className="text-violet-500 ml-0.5">*</span>}
+      </label>
+      {children}
+    </div>
+  )
+}
+
+function Section({ title, icon, children }: { title: string; icon: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+      <div className="flex items-center gap-2.5 px-6 py-4 border-b border-slate-100" style={{ background: '#FAFAFA' }}>
+        <span className="text-base">{icon}</span>
+        <span className="text-sm font-semibold text-slate-700">{title}</span>
+      </div>
+      <div className="p-6 grid grid-cols-2 gap-5">{children}</div>
+    </div>
+  )
+}
+
+export default function LogEntryForm() {
+  const { id } = useParams<{ id: string }>()
+  const isNew = id === 'neu'
+  const navigate = useNavigate()
+  const qc = useQueryClient()
+  const isManager = keycloak.hasRealmRole('manager')
+
+  const [form, setForm] = useState<LogEntryPost>(DEFAULT)
+  const [error, setError] = useState('')
+
+  const { data: entry, isLoading: entryLoading } = useQuery({
+    queryKey: ['logEntry', id],
+    queryFn: () => logEntriesApi.getOne(Number(id)),
+    enabled: !isNew,
+  })
+
+  const { data: birdSpeciesList = [] } = useQuery({ queryKey: ['birdSpecies'], queryFn: birdSpeciesApi.getAll })
+  const { data: circumstances = [] } = useQuery({ queryKey: ['circumstances'], queryFn: circumstancesApi.getAll })
+  const { data: serviceTypes = [] } = useQuery({ queryKey: ['serviceTypes'], queryFn: serviceTypesApi.getAll })
+  useQuery({ queryKey: ['dispositionTypes'], queryFn: dispositionTypesApi.getAll })
+  const { data: careStations = [] } = useQuery({ queryKey: ['careStations'], queryFn: careStationsApi.getAll })
+
+  useEffect(() => {
+    if (entry) {
+      setForm({
+        date: toInputDate(entry.date),
+        age: entry.age,
+        birdSpecies: entry.birdSpecies,
+        circumstance: entry.circumstance,
+        serviceType: entry.serviceType,
+        dispositionType: entry.dispositionType,
+        careStation: entry.careStation,
+        takenInDate: toInputDate(entry.takenInDate),
+        takenInBy: entry.takenInBy,
+        zipFoundAt: entry.zipFoundAt,
+        redirectedTo: entry.redirectedTo,
+        letFreeDate: toInputDate(entry.letFreeDate),
+        diedDate: toInputDate(entry.diedDate),
+        euthanasiaDate: toInputDate(entry.euthanasiaDate),
+      })
+    }
+  }, [entry])
+
+  const createMut = useMutation({
+    mutationFn: (d: LogEntryPost) => logEntriesApi.create(d),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['logEntries'] }); navigate('/') },
+    onError: (e: Error) => setError(e.message),
+  })
+  const updateMut = useMutation({
+    mutationFn: (d: LogEntryPost) => logEntriesApi.update(Number(id), d),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['logEntries'] }); navigate('/') },
+    onError: (e: Error) => setError(e.message),
+  })
+  const deleteMut = useMutation({
+    mutationFn: () => logEntriesApi.delete(Number(id)),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['logEntries'] }); navigate('/') },
+  })
+
+  function set(field: keyof LogEntryPost, value: string | undefined) {
+    setForm((f) => ({ ...f, [field]: value || undefined }))
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const iso = (d?: string) => d ? new Date(d).toISOString() : undefined
+    const payload: LogEntryPost = {
+      ...form,
+      date: new Date(form.date).toISOString(),
+      takenInDate: iso(form.takenInDate),
+      letFreeDate: iso(form.letFreeDate),
+      diedDate: iso(form.diedDate),
+      euthanasiaDate: iso(form.euthanasiaDate),
+    }
+    if (isNew) createMut.mutate(payload)
+    else updateMut.mutate(payload)
+  }
+
+  const isPending = createMut.isPending || updateMut.isPending
+
+  if (!isNew && entryLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="flex items-center gap-4 px-8 py-5 bg-white border-b border-slate-200">
+        <button
+          onClick={() => navigate(-1)}
+          className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 hover:border-slate-300 transition-colors"
+        >
+          <ArrowLeftIcon size={15} />
+        </button>
+        <div>
+          <h1 className="text-xl font-semibold text-slate-900">
+            {isNew ? 'Neuer Eintrag' : `Eintrag #${id}`}
+          </h1>
+          <p className="text-sm text-slate-500 mt-0.5">
+            {isNew ? 'Neuen Vogelfund erfassen' : 'Eintrag bearbeiten'}
+          </p>
+        </div>
+      </div>
+
+      {/* Form */}
+      <div className="flex-1 overflow-auto px-8 py-6">
+        {error && (
+          <div className="mb-4 px-4 py-3 rounded-lg text-sm border" style={{ background: '#FFF1F2', color: '#BE123C', borderColor: '#FECDD3' }}>
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-5 max-w-3xl">
+          <Section title="Basisdaten" icon="📋">
+            <Field label="Meldedatum" required>
+              <input type="date" required value={form.date} onChange={(e) => set('date', e.target.value)} className={inputCls} />
+            </Field>
+            <Field label="Vogelart" required>
+              <input
+                list="birdSpeciesList" required
+                value={form.birdSpecies}
+                onChange={(e) => set('birdSpecies', e.target.value)}
+                placeholder="Vogelart eingeben…"
+                className={inputCls}
+              />
+              <datalist id="birdSpeciesList">
+                {birdSpeciesList.map((b) => <option key={b.id} value={b.name} />)}
+              </datalist>
+            </Field>
+            <Field label="Alter" required>
+              <select required value={form.age} onChange={(e) => set('age', e.target.value)} className={selectCls}>
+                <option value="">— Alter wählen —</option>
+                <option>Küken</option>
+                <option>Jungvogel</option>
+                <option>Altvogel</option>
+              </select>
+            </Field>
+            <Field label="Leistungsart">
+              <select value={form.serviceType ?? ''} onChange={(e) => set('serviceType', e.target.value || undefined)} className={selectCls}>
+                <option value="">— keine —</option>
+                {serviceTypes.map((s) => <option key={s.id} value={s.name}>{s.name}</option>)}
+              </select>
+            </Field>
+          </Section>
+
+          <Section title="Fundumstände" icon="📍">
+            <Field label="Fundumstand" required>
+              <select required value={form.circumstance} onChange={(e) => set('circumstance', e.target.value)} className={selectCls}>
+                <option value="">— Fundumstand wählen —</option>
+                {circumstances.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
+              </select>
+            </Field>
+            <Field label="Fundort PLZ">
+              <input value={form.zipFoundAt ?? ''} onChange={(e) => set('zipFoundAt', e.target.value)} placeholder="z. B. 06258" className={inputCls} />
+            </Field>
+          </Section>
+
+          <Section title="Aufnahme" icon="🏥">
+            <Field label="Aufnahmedatum">
+              <input type="date" value={form.takenInDate ?? ''} onChange={(e) => set('takenInDate', e.target.value)} className={inputCls} />
+            </Field>
+            <Field label="Aufgenommen von">
+              <input value={form.takenInBy ?? ''} onChange={(e) => set('takenInBy', e.target.value)} placeholder="Name…" className={inputCls} />
+            </Field>
+          </Section>
+
+          <Section title="Verbleib" icon="🏁">
+            <Field label="Verbleib">
+              <select value={form.dispositionType ?? ''} onChange={(e) => set('dispositionType', e.target.value || undefined)} className={selectCls}>
+                <option value="">— noch in Pflege —</option>
+                {['vermittelt','weitergeleitet','ausgewildert','verstorben','euthanasiert','unbekannt'].map((v) => (
+                  <option key={v} value={v}>{v}</option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Pflegestelle">
+              <select value={form.careStation ?? ''} onChange={(e) => set('careStation', e.target.value || undefined)} className={selectCls}>
+                <option value="">— keine —</option>
+                {careStations.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
+              </select>
+            </Field>
+            <Field label="Weiterleitung (Freitext)">
+              <input value={form.redirectedTo ?? ''} onChange={(e) => set('redirectedTo', e.target.value)} placeholder="Freitext…" className={inputCls} />
+            </Field>
+            <Field label="Freilassung am">
+              <input type="date" value={form.letFreeDate ?? ''} onChange={(e) => set('letFreeDate', e.target.value)} className={inputCls} />
+            </Field>
+            <Field label="Verstorben am">
+              <input type="date" value={form.diedDate ?? ''} onChange={(e) => set('diedDate', e.target.value)} className={inputCls} />
+            </Field>
+            <Field label="Euthanasie am">
+              <input type="date" value={form.euthanasiaDate ?? ''} onChange={(e) => set('euthanasiaDate', e.target.value)} className={inputCls} />
+            </Field>
+          </Section>
+
+          {/* Actions */}
+          <div className="flex items-center gap-3 pt-3 pb-8">
+            <button
+              type="submit"
+              disabled={isPending}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white disabled:opacity-60 transition-colors"
+              style={{ background: '#7C3AED' }}
+              onMouseEnter={(e) => { if (!isPending) (e.currentTarget as HTMLElement).style.background = '#6D28D9' }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#7C3AED' }}
+            >
+              {isPending && <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+              {isNew ? 'Eintrag erstellen' : 'Änderungen speichern'}
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="px-5 py-2.5 rounded-lg text-sm font-medium border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+            >
+              Abbrechen
+            </button>
+            {!isNew && isManager && (
+              <button
+                type="button"
+                onClick={() => { if (confirm('Eintrag wirklich löschen?')) deleteMut.mutate() }}
+                className="ml-auto inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border transition-colors"
+                style={{ borderColor: '#FECDD3', color: '#E11D48' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#FFF1F2' }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+              >
+                <TrashIcon size={14} />
+                Löschen
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
