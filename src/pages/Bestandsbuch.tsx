@@ -92,7 +92,6 @@ export default function Bestandsbuch() {
         <button
           onClick={() => navigate('/eintrag/neu')}
           className="inline-flex items-center gap-2 rounded-lg text-sm font-medium text-white transition-colors whitespace-nowrap"
-          style={{ padding: '12px 20px' }}
           style={{ background: 'hsl(205, 100%, 35%)', padding: '12px 20px' }}
           onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'hsl(208, 100%, 20%)')}
           onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'hsl(205, 100%, 35%)')}
