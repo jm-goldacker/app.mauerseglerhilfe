@@ -21,14 +21,14 @@ const DEFAULT: LogEntryPost = {
   circumstance: '',
 }
 
-const inputCls = "w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-violet-400 transition-colors placeholder:text-slate-300"
+const inputCls = "w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors placeholder:text-slate-300"
 const selectCls = inputCls
 
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
       <label className="block text-xs font-medium text-slate-600">
-        {label}{required && <span className="text-violet-500 ml-0.5">*</span>}
+        {label}{required && <span className="ml-0.5" style={{ color: 'hsl(205, 100%, 35%)' }}>*</span>}
       </label>
       {children}
     </div>
@@ -38,11 +38,12 @@ function Field({ label, required, children }: { label: string; required?: boolea
 function Section({ title, icon, children }: { title: string; icon: string; children: React.ReactNode }) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-      <div className="flex items-center gap-2.5 px-6 py-4 border-b border-slate-100" style={{ background: '#FAFAFA' }}>
+      <div className="flex items-center gap-2.5 px-6 py-5 border-b border-slate-100"
+        style={{ background: 'hsl(218, 55%, 96%)' }}>
         <span className="text-base">{icon}</span>
-        <span className="text-sm font-semibold text-slate-700">{title}</span>
+        <span className="text-sm font-semibold" style={{ color: 'hsl(208, 100%, 20%)' }}>{title}</span>
       </div>
-      <div className="p-6 grid grid-cols-2 gap-5">{children}</div>
+      <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">{children}</div>
     </div>
   )
 }
@@ -129,7 +130,8 @@ export default function LogEntryForm() {
   if (!isNew && entryLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin"
+          style={{ borderColor: 'hsl(205, 100%, 35%)', borderTopColor: 'transparent' }} />
       </div>
     )
   }
@@ -137,7 +139,7 @@ export default function LogEntryForm() {
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center gap-4 px-8 py-5 bg-white border-b border-slate-200">
+      <div className="flex items-center gap-4 bg-white border-b border-slate-200" style={{ padding: '24px 48px' }}>
         <button
           onClick={() => navigate(-1)}
           className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-slate-200 text-slate-400 hover:text-slate-600 hover:border-slate-300 transition-colors"
@@ -145,7 +147,7 @@ export default function LogEntryForm() {
           <ArrowLeftIcon size={15} />
         </button>
         <div>
-          <h1 className="text-xl font-semibold text-slate-900">
+          <h1 className="text-lg sm:text-xl font-semibold text-slate-900">
             {isNew ? 'Neuer Eintrag' : `Eintrag #${id}`}
           </h1>
           <p className="text-sm text-slate-500 mt-0.5">
@@ -155,17 +157,18 @@ export default function LogEntryForm() {
       </div>
 
       {/* Form */}
-      <div className="flex-1 overflow-auto px-8 py-6">
+      <div className="flex-1 overflow-auto" style={{ padding: '36px 48px' }}>
         {error && (
-          <div className="mb-4 px-4 py-3 rounded-lg text-sm border" style={{ background: '#FFF1F2', color: '#BE123C', borderColor: '#FECDD3' }}>
+          <div className="mb-4 px-4 py-3 rounded-lg text-sm border" style={{ background: '#fff1f2', color: '#be123c', borderColor: '#fecdd3' }}>
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5 max-w-3xl">
+        <form onSubmit={handleSubmit} className="max-w-3xl" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           <Section title="Basisdaten" icon="📋">
             <Field label="Meldedatum" required>
-              <input type="date" required value={form.date} onChange={(e) => set('date', e.target.value)} className={inputCls} />
+              <input type="date" required value={form.date} onChange={(e) => set('date', e.target.value)} className={inputCls}
+                style={{ '--tw-ring-color': 'hsl(205, 100%, 35%, 0.3)', '--tw-border-color-focus': 'hsl(205, 100%, 35%)' } as React.CSSProperties} />
             </Field>
             <Field label="Vogelart" required>
               <input
@@ -246,22 +249,25 @@ export default function LogEntryForm() {
           </Section>
 
           {/* Actions */}
-          <div className="flex items-center gap-3 pt-3 pb-8">
+          <div className="flex flex-wrap items-center gap-3 pt-4 pb-10">
             <button
               type="submit"
               disabled={isPending}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium text-white disabled:opacity-60 transition-colors"
-              style={{ background: '#7C3AED' }}
-              onMouseEnter={(e) => { if (!isPending) (e.currentTarget as HTMLElement).style.background = '#6D28D9' }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#7C3AED' }}
+              className="inline-flex items-center gap-2 rounded-lg text-sm font-medium text-white disabled:opacity-60 transition-colors"
+              style={{ padding: '12px 24px', background: 'hsl(205, 100%, 35%)' }}
+              onMouseEnter={(e) => { if (!isPending) (e.currentTarget as HTMLElement).style.background = 'hsl(208, 100%, 20%)' }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'hsl(205, 100%, 35%)' }}
             >
-              {isPending && <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+              {isPending && (
+                <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              )}
               {isNew ? 'Eintrag erstellen' : 'Änderungen speichern'}
             </button>
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="px-5 py-2.5 rounded-lg text-sm font-medium border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+              className="rounded-lg text-sm font-medium border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+              style={{ padding: '12px 24px' }}
             >
               Abbrechen
             </button>
@@ -269,9 +275,9 @@ export default function LogEntryForm() {
               <button
                 type="button"
                 onClick={() => { if (confirm('Eintrag wirklich löschen?')) deleteMut.mutate() }}
-                className="ml-auto inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border transition-colors"
-                style={{ borderColor: '#FECDD3', color: '#E11D48' }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#FFF1F2' }}
+                className="ml-auto inline-flex items-center gap-2 rounded-lg text-sm font-medium border transition-colors"
+                style={{ padding: '12px 20px', borderColor: '#fecdd3', color: '#e11d48' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#fff1f2' }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
               >
                 <TrashIcon size={14} />

@@ -1,11 +1,19 @@
 @import "tailwindcss";
 
+@theme {
+  --color-nabu-blue: hsl(205, 100%, 35%);
+  --color-nabu-darkblue: hsl(208, 100%, 20%);
+  --color-nabu-lightblue: hsl(218, 55%, 91%);
+  --color-nabu-orange: hsl(31, 100%, 47%);
+  --color-nabu-darkorange: hsl(31, 100%, 36%);
+}
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background: #F1F5F9;
-  color: #0F172A;
+  background: hsl(218, 55%, 91%);
+  color: hsl(0, 0%, 0%);
   font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -13,11 +21,9 @@ body {
 
 #root { width: 100%; min-height: 100vh; }
 
-/* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+::-webkit-scrollbar-thumb { background: hsl(218, 30%, 75%); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(205, 100%, 35%); }
 
-/* Date input fix */
 input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0.5; cursor: pointer; }

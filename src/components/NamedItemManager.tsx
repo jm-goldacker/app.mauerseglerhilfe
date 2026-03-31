@@ -40,16 +40,16 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center justify-between px-8 py-5 bg-white border-b border-slate-200">
+      <div className="flex items-center justify-between bg-white border-b border-slate-200" style={{ padding: '24px 48px' }}>
         <div>
-          <h1 className="text-xl font-semibold text-slate-900">{title}</h1>
+          <h1 className="text-lg sm:text-xl font-semibold text-slate-900">{title}</h1>
           {description && <p className="text-sm text-slate-500 mt-0.5">{description}</p>}
         </div>
         <span className="text-sm text-slate-400">{data.length} Einträge</span>
       </div>
 
-      <div className="flex-1 overflow-auto px-8 py-6">
-        <div className="max-w-lg space-y-3">
+      <div className="flex-1 overflow-auto" style={{ padding: '36px 48px' }}>
+        <div className="max-w-lg" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {/* Add form */}
           {isManager && (
             <form
@@ -60,15 +60,16 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="Neuer Eintrag…"
-                className="flex-1 px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-violet-400 transition-colors placeholder:text-slate-300"
+                className="flex-1 px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors placeholder:text-slate-300"
+                style={{ '--tw-ring-color': 'hsl(205, 100%, 35%, 0.3)' } as React.CSSProperties}
               />
               <button
                 type="submit"
                 disabled={!newName.trim() || createMut.isPending}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-white disabled:opacity-50 transition-colors flex-shrink-0"
-                style={{ background: '#7C3AED' }}
-                onMouseEnter={(e) => { if (newName.trim()) (e.currentTarget as HTMLElement).style.background = '#6D28D9' }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#7C3AED' }}
+                className="inline-flex items-center gap-2 rounded-lg text-sm font-medium text-white disabled:opacity-50 transition-colors flex-shrink-0"
+                style={{ padding: '12px 20px', background: 'hsl(205, 100%, 35%)' }}
+                onMouseEnter={(e) => { if (newName.trim()) (e.currentTarget as HTMLElement).style.background = 'hsl(208, 100%, 20%)' }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'hsl(205, 100%, 35%)' }}
               >
                 <PlusIcon size={14} />
                 Hinzufügen
@@ -81,7 +82,7 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
             {isLoading ? (
               <div className="space-y-0.5 p-2">
                 {[1,2,3,4].map((i) => (
-                  <div key={i} className="h-11 rounded-lg animate-pulse" style={{ background: '#F1F5F9' }} />
+                  <div key={i} className="h-11 rounded-lg animate-pulse" style={{ background: 'hsl(218, 55%, 91%)' }} />
                 ))}
               </div>
             ) : data.length === 0 ? (
@@ -91,7 +92,7 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
             ) : (
               <ul className="divide-y divide-slate-100">
                 {data.map((item) => (
-                  <li key={item.id} className="flex items-center gap-3 px-5 py-4 group transition-colors hover:bg-slate-50">
+                  <li key={item.id} className="flex items-center gap-3 px-5 py-5 group transition-colors hover:bg-slate-50">
                     {editId === item.id ? (
                       <>
                         <input
@@ -99,7 +100,8 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
                           onChange={(e) => setEditName(e.target.value)}
                           autoFocus
                           onKeyDown={(e) => { if (e.key === 'Escape') setEditId(null) }}
-                          className="flex-1 px-3 py-1.5 text-sm border border-violet-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-violet-400"
+                          className="flex-1 px-3 py-1.5 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors"
+                          style={{ borderColor: 'hsl(205, 100%, 60%)', '--tw-ring-color': 'hsl(205, 100%, 35%, 0.3)' } as React.CSSProperties}
                         />
                         <button
                           onClick={() => updateMut.mutate({ id: item.id, name: editName })}
@@ -122,18 +124,18 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
                             <button
                               onClick={() => { setEditId(item.id); setEditName(item.name) }}
                               className="inline-flex items-center justify-center w-7 h-7 rounded-md transition-colors"
-                              style={{ color: '#94A3B8' }}
-                              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#7C3AED'; (e.currentTarget as HTMLElement).style.background = '#F3E8FF' }}
-                              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#94A3B8'; (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+                              style={{ color: '#94a3b8' }}
+                              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(205, 100%, 35%)'; (e.currentTarget as HTMLElement).style.background = 'hsl(218, 55%, 91%)' }}
+                              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#94a3b8'; (e.currentTarget as HTMLElement).style.background = 'transparent' }}
                             >
                               <EditIcon size={13} />
                             </button>
                             <button
                               onClick={() => { if (confirm(`„${item.name}" löschen?`)) deleteMut.mutate(item.id) }}
                               className="inline-flex items-center justify-center w-7 h-7 rounded-md transition-colors"
-                              style={{ color: '#94A3B8' }}
-                              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#E11D48'; (e.currentTarget as HTMLElement).style.background = '#FFF1F2' }}
-                              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#94A3B8'; (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+                              style={{ color: '#94a3b8' }}
+                              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#e11d48'; (e.currentTarget as HTMLElement).style.background = '#fff1f2' }}
+                              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#94a3b8'; (e.currentTarget as HTMLElement).style.background = 'transparent' }}
                             >
                               <TrashIcon size={13} />
                             </button>

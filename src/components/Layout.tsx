@@ -4,8 +4,15 @@ import keycloak from '../auth/keycloak'
 import {
   BookIcon, ChartIcon, CarIcon, SettingsIcon,
   ChevronDownIcon, ChevronRightIcon, ChevronLeftIcon,
-  BirdIcon, LogoutIcon, UserIcon,
+  BirdIcon, LogoutIcon, UserIcon, MenuIcon, XIcon,
 } from './Icons'
+
+const SIDEBAR_BG = 'hsl(208, 100%, 20%)'
+const SIDEBAR_BORDER = 'hsla(208, 100%, 50%, 0.25)'
+const ACTIVE_BG = 'hsla(205, 100%, 55%, 0.2)'
+const INACTIVE_TEXT = 'hsla(218, 100%, 88%, 0.7)'
+const HOVER_BG = 'hsla(218, 100%, 88%, 0.08)'
+const ORANGE = 'hsl(31, 100%, 47%)'
 
 const navItems = [
   { path: '/', label: 'Bestandsbuch', Icon: BookIcon },
@@ -24,165 +31,241 @@ const navItems = [
   },
 ]
 
+interface SidebarProps {
+  collapsed: boolean
+  setCollapsed: (v: boolean) => void
+  stammdatenOpen: boolean
+  setStammdatenOpen: (v: boolean) => void
+  location: ReturnType<typeof useLocation>
+  isChildActive: boolean
+  username: string
+  initials: string
+  showCollapseBtn: boolean
+  showCloseBtn: boolean
+  onClose?: () => void
+}
+
+function SidebarContent({
+  collapsed, setCollapsed,
+  stammdatenOpen, setStammdatenOpen,
+  location, isChildActive,
+  username, initials,
+  showCollapseBtn, showCloseBtn, onClose,
+}: SidebarProps) {
+  const close = onClose ?? (() => {})
+
+  return (
+    <>
+      {/* Logo */}
+      <div className="flex items-center flex-shrink-0" style={{ height: 64, padding: '0 20px', borderBottom: `1px solid ${SIDEBAR_BORDER}` }}>
+        <div className="flex items-center justify-center w-9 h-9 rounded-xl flex-shrink-0"
+          style={{ background: 'hsl(205, 100%, 35%)', margin: !collapsed ? '0 10px 0 0' : '0' }}
+          onClick={() => setCollapsed(!collapsed)}>
+          <BirdIcon size={20} className="text-white"  />
+        </div>
+        {!collapsed && (
+          <div className="ml-3 overflow-hidden flex-1 min-w-0">
+            <div className="text-white font-semibold text-sm whitespace-nowrap">Mauerseglerhilfe</div>
+            <div className="text-xs whitespace-nowrap" style={{ color: INACTIVE_TEXT }}>Bestandsbuch</div>
+          </div>
+        )}
+        {showCollapseBtn && !collapsed &&(
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="flex items-center justify-center w-7 h-7 rounded-lg transition-colors flex-shrink-0 ml-auto"
+            style={{ color: INACTIVE_TEXT }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#fff')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = INACTIVE_TEXT)}
+          >
+            <span style={{ display: 'inline-flex', transition: 'transform 220ms', transform: collapsed ? 'rotate(180deg)' : 'none' }}>
+              <ChevronLeftIcon size={15} />
+            </span>
+          </button>
+        )}
+        {showCloseBtn && (
+          <button
+            onClick={close}
+            className="flex items-center justify-center w-7 h-7 rounded-lg transition-colors flex-shrink-0 ml-auto"
+            style={{ color: INACTIVE_TEXT }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#fff')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = INACTIVE_TEXT)}
+          >
+            <XIcon size={16} />
+          </button>
+        )}
+      </div>
+
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto" style={{ padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+        {navItems.map((item) => {
+          if (item.children) {
+            const active = isChildActive
+            return (
+              <div key={item.label} style={{ padding: '12px 0'}}>
+                <button
+                  onClick={() => !collapsed && setStammdatenOpen(!stammdatenOpen)}
+                  title={collapsed ? item.label : undefined}
+                  className="w-full flex items-center gap-3 rounded-xl text-sm font-medium transition-colors"
+                  style={{ color: active ? '#fff' : INACTIVE_TEXT, background: active ? ACTIVE_BG : 'transparent' }}
+                  onMouseEnter={(e) => { if (!active) { e.currentTarget.style.background = HOVER_BG; e.currentTarget.style.color = '#fff' }}}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = active ? ACTIVE_BG : 'transparent'; e.currentTarget.style.color = active ? '#fff' : INACTIVE_TEXT }}
+                >
+                  <item.Icon size={17} className="flex-shrink-0" />
+                  {!collapsed && (
+                    <>
+                      <span className="flex-1 text-left">{item.label}</span>
+                      {stammdatenOpen ? <ChevronDownIcon size={14} /> : <ChevronRightIcon size={14} />}
+                    </>
+                  )}
+                </button>
+                {stammdatenOpen && !collapsed && (
+                  <div className="mt-1 space-y-0.5 ml-2">
+                    {item.children.map((child) => {
+                      const childActive = location.pathname === child.path
+                      return (
+                        <Link
+                          key={child.path}
+                          to={child.path}
+                          onClick={close}
+                          className="flex items-center gap-3 pl-9 pr-4 py-2.5 rounded-lg text-sm transition-colors"
+                          style={{ color: childActive ? '#fff' : INACTIVE_TEXT, background: childActive ? ACTIVE_BG : 'transparent', fontWeight: childActive ? 500 : 400 }}
+                          onMouseEnter={(e) => { if (!childActive) { (e.currentTarget as HTMLElement).style.color = '#fff'; (e.currentTarget as HTMLElement).style.background = HOVER_BG }}}
+                          onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = childActive ? '#fff' : INACTIVE_TEXT; (e.currentTarget as HTMLElement).style.background = childActive ? ACTIVE_BG : 'transparent' }}
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                            style={{ background: childActive ? ORANGE : 'hsla(218, 60%, 70%, 0.4)' }} />
+                          {child.label}
+                        </Link>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
+            )
+          }
+
+          const active = location.pathname === item.path
+          return (
+            <Link
+              key={item.path}
+              to={item.path!}
+              onClick={close}
+              title={collapsed ? item.label : undefined}
+              className="flex items-center gap-3 rounded-xl text-sm font-medium transition-colors relative"
+              style={{ padding: '12px 0', color: active ? '#fff' : INACTIVE_TEXT, background: 'transparent' }}
+            >
+              <item.Icon size={17} className="flex-shrink-0" />
+              {!collapsed && <span>{item.label}</span>}
+            </Link>
+          )
+        })}
+      </nav>
+
+      {/* User */}
+      <div className="flex-shrink-0" style={{ padding: '16px 12px 20px', borderTop: `1px solid ${SIDEBAR_BORDER}` }}>
+        <div className={`flex items-center gap-3 px-3 py-3 rounded-xl ${collapsed ? 'justify-center' : ''}`}>
+          <div className="flex items-center justify-center w-9 h-9 rounded-full flex-shrink-0 text-xs font-bold text-white"
+            style={{ background: 'hsl(205, 100%, 35%)' }}>
+            {collapsed ? <UserIcon size={15} /> : initials}
+          </div>
+          {!collapsed && (
+            <div className="flex-1 overflow-hidden">
+              <div className="text-sm font-medium truncate text-white">{username}</div>
+            </div>
+          )}
+          {!collapsed && (
+            <button
+              onClick={() => keycloak.logout()}
+              className="flex items-center justify-center w-8 h-8 rounded-lg transition-colors flex-shrink-0"
+              title="Abmelden"
+              style={{ color: INACTIVE_TEXT }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#EF4444'; (e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.15)' }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = INACTIVE_TEXT; (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+            >
+              <LogoutIcon size={15} />
+            </button>
+          )}
+        </div>
+      </div>
+    </>
+  )
+}
+
 export default function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation()
   const [collapsed, setCollapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
   const [stammdatenOpen, setStammdatenOpen] = useState(
     location.pathname.startsWith('/stammdaten')
   )
   const username = keycloak.tokenParsed?.preferred_username || 'Benutzer'
   const initials = username.slice(0, 2).toUpperCase()
-
   const isChildActive = navItems
     .find((i) => i.children)
     ?.children?.some((c) => c.path === location.pathname) ?? false
 
+  const sharedProps = {
+    collapsed, setCollapsed,
+    stammdatenOpen, setStammdatenOpen,
+    location, isChildActive,
+    username, initials,
+  }
+
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: '#F1F5F9' }}>
-      {/* Sidebar */}
+    <div className="flex h-screen overflow-hidden" style={{ background: 'hsl(218, 55%, 91%)' }}>
+
+      {/* ── Desktop sidebar (in normal document flow) ── */}
       <aside
-        style={{ width: collapsed ? 64 : 224, background: '#18181B', transition: 'width 220ms ease' }}
-        className="flex flex-col flex-shrink-0 overflow-hidden"
+        className="hidden lg:flex flex-col flex-shrink-0 overflow-hidden"
+        style={{ background: SIDEBAR_BG, width: collapsed ? 64 : 224, transition: 'width 220ms ease', alignItems: 'center' }}
       >
-        {/* Logo */}
-        <div className="flex items-center h-16 px-4 border-b" style={{ borderColor: '#27272A' }}>
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg flex-shrink-0"
-            style={{ background: 'linear-gradient(135deg, #7C3AED, #4F46E5)' }}>
-            <BirdIcon size={16} className="text-white" />
-          </div>
-          {!collapsed && (
-            <div className="ml-3 overflow-hidden">
-              <div className="text-white font-semibold text-sm whitespace-nowrap">Mauerseglerhilfe</div>
-              <div className="text-xs whitespace-nowrap" style={{ color: '#71717A' }}>Bestandsbuch</div>
-            </div>
-          )}
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="ml-auto flex items-center justify-center w-6 h-6 rounded transition-colors flex-shrink-0"
-            style={{ color: '#52525B' }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = '#A1A1AA')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = '#52525B')}
-          >
-            <span style={{ display: 'inline-flex', transition: 'transform 220ms', transform: collapsed ? 'rotate(180deg)' : 'none' }}>
-              <ChevronLeftIcon size={14} />
-            </span>
-          </button>
-        </div>
-
-        {/* Nav */}
-        <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
-          {navItems.map((item) => {
-            if (item.children) {
-              const active = isChildActive
-              return (
-                <div key={item.label}>
-                  <button
-                    onClick={() => !collapsed && setStammdatenOpen(!stammdatenOpen)}
-                    title={collapsed ? item.label : undefined}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors"
-                    style={{
-                      color: active ? '#A78BFA' : '#A1A1AA',
-                      background: active ? 'rgba(124,58,237,0.12)' : 'transparent',
-                    }}
-                    onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#E4E4E7' }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = active ? 'rgba(124,58,237,0.12)' : 'transparent'; e.currentTarget.style.color = active ? '#A78BFA' : '#A1A1AA' }}
-                  >
-                    <item.Icon size={16} className="flex-shrink-0" />
-                    {!collapsed && (
-                      <>
-                        <span className="flex-1 text-left">{item.label}</span>
-                        {stammdatenOpen
-                          ? <ChevronDownIcon size={13} />
-                          : <ChevronRightIcon size={13} />
-                        }
-                      </>
-                    )}
-                  </button>
-                  {stammdatenOpen && !collapsed && (
-                    <div className="mt-0.5 space-y-0.5">
-                      {item.children.map((child) => {
-                        const childActive = location.pathname === child.path
-                        return (
-                          <Link
-                            key={child.path}
-                            to={child.path}
-                            className="flex items-center gap-3 pl-10 pr-3 py-2.5 rounded-lg text-sm transition-colors"
-                            style={{
-                              color: childActive ? '#C4B5FD' : '#71717A',
-                              background: childActive ? 'rgba(124,58,237,0.15)' : 'transparent',
-                              fontWeight: childActive ? 500 : 400,
-                            }}
-                            onMouseEnter={(e) => { if (!childActive) { (e.currentTarget as HTMLElement).style.color = '#A1A1AA'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)' }}}
-                            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = childActive ? '#C4B5FD' : '#71717A'; (e.currentTarget as HTMLElement).style.background = childActive ? 'rgba(124,58,237,0.15)' : 'transparent' }}
-                          >
-                            <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: childActive ? '#A78BFA' : '#3F3F46' }} />
-                            {child.label}
-                          </Link>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
-              )
-            }
-
-            const active = location.pathname === item.path
-            return (
-              <Link
-                key={item.path}
-                to={item.path!}
-                title={collapsed ? item.label : undefined}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors relative"
-                style={{
-                  color: active ? '#C4B5FD' : '#A1A1AA',
-                  background: active ? 'rgba(124,58,237,0.15)' : 'transparent',
-                  fontWeight: active ? 500 : 400,
-                }}
-                onMouseEnter={(e) => { if (!active) { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.05)'; (e.currentTarget as HTMLElement).style.color = '#E4E4E7' }}}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = active ? 'rgba(124,58,237,0.15)' : 'transparent'; (e.currentTarget as HTMLElement).style.color = active ? '#C4B5FD' : '#A1A1AA' }}
-              >
-                {active && (
-                  <span className="absolute left-0 top-1 bottom-1 w-0.5 rounded-full" style={{ background: '#7C3AED' }} />
-                )}
-                <item.Icon size={16} className="flex-shrink-0" />
-                {!collapsed && <span>{item.label}</span>}
-              </Link>
-            )
-          })}
-        </nav>
-
-        {/* User */}
-        <div className="px-2 pb-3 border-t pt-3" style={{ borderColor: '#27272A' }}>
-          <div className={`flex items-center gap-3 px-2 py-2 rounded-lg ${collapsed ? 'justify-center' : ''}`}>
-            <div className="flex items-center justify-center w-8 h-8 rounded-full flex-shrink-0 text-xs font-bold text-white"
-              style={{ background: 'linear-gradient(135deg, #7C3AED, #6D28D9)' }}>
-              {collapsed ? <UserIcon size={14} /> : initials}
-            </div>
-            {!collapsed && (
-              <div className="flex-1 overflow-hidden">
-                <div className="text-sm font-medium truncate" style={{ color: '#E4E4E7' }}>{username}</div>
-              </div>
-            )}
-            {!collapsed && (
-              <button
-                onClick={() => keycloak.logout()}
-                className="flex items-center justify-center w-7 h-7 rounded-md transition-colors flex-shrink-0"
-                title="Abmelden"
-                style={{ color: '#52525B' }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#EF4444'; (e.currentTarget as HTMLElement).style.background = 'rgba(239,68,68,0.1)' }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#52525B'; (e.currentTarget as HTMLElement).style.background = 'transparent' }}
-              >
-                <LogoutIcon size={14} />
-              </button>
-            )}
-          </div>
-        </div>
+        <SidebarContent {...sharedProps} showCollapseBtn showCloseBtn={false} />
       </aside>
 
-      {/* Main */}
-      <main className="flex-1 overflow-auto">
-        {children}
-      </main>
+      {/* ── Mobile overlay backdrop ── */}
+      {mobileOpen && (
+        <div className="lg:hidden fixed inset-0 bg-black/50 z-20" onClick={() => setMobileOpen(false)} />
+      )}
+
+      {/* ── Mobile sidebar (fixed overlay) ── */}
+      <aside
+        className="lg:hidden fixed inset-y-0 left-0 z-30 flex flex-col overflow-hidden"
+        style={{
+          background: SIDEBAR_BG,
+          width: 260,
+          transform: mobileOpen ? 'translateX(0)' : 'translateX(-100%)',
+          transition: 'transform 220ms ease',
+        }}
+      >
+        <SidebarContent {...sharedProps} showCollapseBtn={false} showCloseBtn onClose={() => setMobileOpen(false)} />
+      </aside>
+
+      {/* ── Main ── */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Mobile top bar */}
+        <header className="gap-5 flex items-center h-14 px-4 bg-white border-b border-slate-200 lg:hidden flex-shrink-0 shadow-sm">
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+          >
+            <MenuIcon size={22} />
+          </button>
+          <div className="flex items-center gap-2.5 ml-3">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg" style={{ background: 'hsl(205, 100%, 35%)' }}>
+              <BirdIcon size={16} className="text-white" />
+            </div>
+            <span className="font-semibold" style={{ color: 'hsl(208, 100%, 20%)' }}>Mauerseglerhilfe</span>
+          </div>
+          <div className="ml-auto flex items-center justify-center w-8 h-8 rounded-full text-xs font-bold text-white"
+            style={{ background: 'hsl(205, 100%, 35%)' }}>
+            {initials}
+          </div>
+        </header>
+
+        <main className="flex-1 overflow-auto">
+          {children}
+        </main>
+      </div>
     </div>
   )
 }
