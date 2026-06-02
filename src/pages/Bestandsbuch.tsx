@@ -74,6 +74,7 @@ export default function Bestandsbuch() {
   const filtered = entries.filter((e) => {
     const q = search.toLowerCase()
     const matchSearch = !q ||
+      (e.name ?? '').toLowerCase().includes(q) ||
       e.birdSpecies.toLowerCase().includes(q) ||
       e.circumstance.toLowerCase().includes(q) ||
       (e.zipFoundAt ?? '').includes(q) ||
@@ -108,7 +109,7 @@ export default function Bestandsbuch() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Vogelart, PLZ, Aufgenommen von…"
+            placeholder="Name, Vogelart, PLZ, Aufgenommen von…"
             className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg bg-slate-50 focus:outline-none focus:ring-2 focus:bg-white transition-colors"
             style={{ '--tw-ring-color': 'hsl(205, 100%, 35%, 0.3)' } as React.CSSProperties}
           />
@@ -133,11 +134,11 @@ export default function Bestandsbuch() {
             <Skeleton />
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse min-w-[900px]">
+              <table className="w-full text-sm border-collapse min-w-[1100px]">
                 <thead>
                   <tr style={{ background: 'hsl(218, 55%, 95%)', borderBottom: '1px solid hsl(218, 30%, 88%)' }}>
-                    {['#', 'Datum', 'Vogelart', 'Alter', 'Leistungsart', 'Aufnahme', 'Von', 'PLZ', 'Fundumstand', 'Weiterleitung', 'Verbleib am', 'Verbleib', ''].map((h) => (
-                      <th key={h} className="px-4 py-4 text-left font-medium text-xs uppercase tracking-wide"
+                    {['#', 'Datum', 'Name', 'Vogelart', 'Alter', 'Leistungsart', 'Aufnahme', 'Von', 'PLZ', 'Fundumstand', 'Weiterleitung', 'Verbleib am', 'Verbleib', ''].map((h) => (
+                      <th key={h} className="px-4 py-4 text-left font-medium text-xs uppercase tracking-wide whitespace-nowrap"
                         style={{ color: 'hsl(208, 100%, 30%)' }}>
                         {h}
                       </th>
@@ -159,7 +160,8 @@ export default function Bestandsbuch() {
                       >
                         <td className="px-4 py-4 text-xs font-mono text-slate-300">{String(entry.id).padStart(3, '0')}</td>
                         <td className="px-4 py-4 whitespace-nowrap text-slate-600">{formatDate(entry.date)}</td>
-                        <td className="px-4 py-4 font-medium text-slate-900">{entry.birdSpecies}</td>
+                        <td className="px-4 py-4 font-medium text-slate-900">{entry.name ?? <span className="text-slate-300">—</span>}</td>
+                        <td className="px-4 py-4 text-slate-600">{entry.birdSpecies}</td>
                         <td className="px-3 py-4"><AgeBadge value={entry.age} /></td>
                         <td className="px-4 py-4 text-slate-500">{entry.serviceType ?? '—'}</td>
                         <td className="px-4 py-4 whitespace-nowrap text-slate-500">{formatDate(entry.takenInDate)}</td>
@@ -168,8 +170,8 @@ export default function Bestandsbuch() {
                         <td className="px-4 py-4 text-slate-500 max-w-48 truncate">{entry.circumstance}</td>
                         <td className="px-4 py-4 text-slate-500">{entry.careStation ?? entry.redirectedTo ?? '—'}</td>
                         <td className="px-4 py-4 whitespace-nowrap text-slate-500">{formatDate(verbleibDate)}</td>
-                        <td className="px-3 py-4">{verbleib ? <VerbleibBadge value={verbleib} /> : <span className="text-slate-300 text-xs">in Pflege</span>}</td>
-                        <td className="px-3 py-4" onClick={(e) => e.stopPropagation()}>
+                        <td className="px-3 py-4 whitespace-nowrap">{verbleib ? <VerbleibBadge value={verbleib} /> : <span className="text-slate-300 text-xs whitespace-nowrap">in Pflege</span>}</td>
+                        <td className="px-3 py-4 w-12" onClick={(e) => e.stopPropagation()}>
                           <button
                             onClick={() => navigate(`/eintrag/${entry.id}`)}
                             className="inline-flex items-center justify-center w-7 h-7 rounded-md transition-colors"

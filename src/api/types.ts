@@ -6,6 +6,7 @@ export interface NamedItem {
 export interface LogEntry {
   id: number
   date: string
+  name?: string
   age: string
   birdSpecies: string
   circumstance: string
@@ -23,6 +24,7 @@ export interface LogEntry {
 
 export interface LogEntryPost {
   date: string
+  name?: string
   age: string
   birdSpecies: string
   circumstance: string

@@ -4,6 +4,14 @@ const env = (window as Window & { __ENV__?: Record<string, string> }).__ENV__ ??
 const API_BASE = env.API_URL ?? import.meta.env.VITE_API_URL ?? 'http://localhost:5078/api'
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  // Token erneuern, falls er in den nächsten 30 Sekunden abläuft.
+  // Schlägt der Refresh fehl (Session abgelaufen), zum Login umleiten.
+  try {
+    await keycloak.updateToken(30)
+  } catch {
+    await keycloak.login()
+    throw new Error('Sitzung abgelaufen – bitte erneut anmelden')
+  }
   const token = keycloak.token
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -11,6 +19,10 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     ...options.headers,
   }
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers })
+  if (res.status === 401) {
+    await keycloak.login()
+    throw new Error('Sitzung abgelaufen – bitte erneut anmelden')
+  }
   if (!res.ok) {
     const text = await res.text()
     throw new Error(text || `HTTP ${res.status}`)

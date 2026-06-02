@@ -74,6 +74,7 @@ export default function LogEntryForm() {
     if (entry) {
       setForm({
         date: toInputDate(entry.date),
+        name: entry.name,
         age: entry.age,
         birdSpecies: entry.birdSpecies,
         circumstance: entry.circumstance,
@@ -181,6 +182,9 @@ export default function LogEntryForm() {
               <datalist id="birdSpeciesList">
                 {birdSpeciesList.map((b) => <option key={b.id} value={b.name} />)}
               </datalist>
+            </Field>
+            <Field label="Name">
+              <input value={form.name ?? ''} onChange={(e) => set('name', e.target.value)} placeholder="z. B. Piepsi…" className={inputCls} />
             </Field>
             <Field label="Alter" required>
               <select required value={form.age} onChange={(e) => set('age', e.target.value)} className={selectCls}>
