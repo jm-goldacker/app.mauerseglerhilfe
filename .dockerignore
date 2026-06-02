@@ -1,0 +1,9 @@
+.git
+.claude
+node_modules
+dist
+nginx-proxy
+INSTALLATION.md
+README.md
+docker-compose.dev.yml
+docker-compose.prod.yml
