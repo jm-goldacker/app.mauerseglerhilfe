@@ -71,16 +71,18 @@ export default function Bestandsbuch() {
 
   const years = [...new Set(entries.map((e) => new Date(e.date).getFullYear()))].sort((a, b) => b - a)
 
-  const filtered = entries.filter((e) => {
-    const q = search.toLowerCase()
-    const matchSearch = !q ||
-      (e.name ?? '').toLowerCase().includes(q) ||
-      e.birdSpecies.toLowerCase().includes(q) ||
-      e.circumstance.toLowerCase().includes(q) ||
-      (e.zipFoundAt ?? '').includes(q) ||
-      (e.takenInBy ?? '').toLowerCase().includes(q)
-    return matchSearch && (!filterYear || new Date(e.date).getFullYear() === Number(filterYear))
-  })
+  const filtered = entries
+    .filter((e) => {
+      const q = search.toLowerCase()
+      const matchSearch = !q ||
+        (e.name ?? '').toLowerCase().includes(q) ||
+        e.birdSpecies.toLowerCase().includes(q) ||
+        e.circumstance.toLowerCase().includes(q) ||
+        (e.zipFoundAt ?? '').includes(q) ||
+        (e.takenInBy ?? '').toLowerCase().includes(q)
+      return matchSearch && (!filterYear || new Date(e.date).getFullYear() === Number(filterYear))
+    })
+    .sort((a, b) => a.id - b.id)
 
   return (
     <div className="flex flex-col h-full">

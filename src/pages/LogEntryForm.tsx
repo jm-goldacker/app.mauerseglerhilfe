@@ -58,7 +58,7 @@ export default function LogEntryForm() {
   const [form, setForm] = useState<LogEntryPost>(DEFAULT)
   const [error, setError] = useState('')
 
-  const { data: entry, isLoading: entryLoading } = useQuery({
+  const { data: entry, isLoading: entryLoading, error: entryError, refetch } = useQuery({
     queryKey: ['logEntry', id],
     queryFn: () => logEntriesApi.getOne(Number(id)),
     enabled: !isNew,
@@ -133,6 +133,35 @@ export default function LogEntryForm() {
       <div className="flex items-center justify-center h-64">
         <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin"
           style={{ borderColor: 'hsl(205, 100%, 35%)', borderTopColor: 'transparent' }} />
+      </div>
+    )
+  }
+
+  // Eintrag konnte nicht geladen werden → Fehler anzeigen statt leerer Maske,
+  // sonst sieht das Bearbeiten wie ein neuer Eintrag aus
+  if (!isNew && (entryError || !entry)) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <div className="px-4 py-3 rounded-lg text-sm border max-w-md text-center"
+          style={{ background: '#fff1f2', color: '#be123c', borderColor: '#fecdd3' }}>
+          Eintrag #{id} konnte nicht geladen werden{entryError ? `: ${entryError.message}` : ''}
+        </div>
+        <div className="flex gap-3">
+          <button
+            onClick={() => refetch()}
+            className="rounded-lg text-sm font-medium text-white transition-colors"
+            style={{ padding: '10px 20px', background: 'hsl(205, 100%, 35%)' }}
+          >
+            Erneut versuchen
+          </button>
+          <button
+            onClick={() => navigate('/')}
+            className="rounded-lg text-sm font-medium border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
+            style={{ padding: '10px 20px' }}
+          >
+            Zurück zur Übersicht
+          </button>
+        </div>
       </div>
     )
   }
