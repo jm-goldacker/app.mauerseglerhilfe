@@ -21,7 +21,7 @@ const DEFAULT: LogEntryPost = {
   circumstance: '',
 }
 
-const inputCls = "w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors placeholder:text-slate-300"
+const inputCls = "w-full px-4 py-3 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors placeholder:text-slate-300"
 const selectCls = inputCls
 
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
@@ -38,12 +38,12 @@ function Field({ label, required, children }: { label: string; required?: boolea
 function Section({ title, icon, children }: { title: string; icon: string; children: React.ReactNode }) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-      <div className="flex items-center gap-2.5 px-6 py-5 border-b border-slate-100"
+      <div className="flex items-center gap-2.5 px-8 py-6 border-b border-slate-100"
         style={{ background: 'hsl(218, 55%, 96%)' }}>
         <span className="text-base">{icon}</span>
         <span className="text-sm font-semibold" style={{ color: 'hsl(208, 100%, 20%)' }}>{title}</span>
       </div>
-      <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">{children}</div>
+      <div className="p-8 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-7">{children}</div>
     </div>
   )
 }
@@ -67,7 +67,7 @@ export default function LogEntryForm() {
   const { data: birdSpeciesList = [] } = useQuery({ queryKey: ['birdSpecies'], queryFn: birdSpeciesApi.getAll })
   const { data: circumstances = [] } = useQuery({ queryKey: ['circumstances'], queryFn: circumstancesApi.getAll })
   const { data: serviceTypes = [] } = useQuery({ queryKey: ['serviceTypes'], queryFn: serviceTypesApi.getAll })
-  useQuery({ queryKey: ['dispositionTypes'], queryFn: dispositionTypesApi.getAll })
+  const { data: dispositionTypes = [] } = useQuery({ queryKey: ['dispositionTypes'], queryFn: dispositionTypesApi.getAll })
   const { data: careStations = [] } = useQuery({ queryKey: ['careStations'], queryFn: careStationsApi.getAll })
 
   useEffect(() => {
@@ -256,8 +256,8 @@ export default function LogEntryForm() {
             <Field label="Verbleib">
               <select value={form.dispositionType ?? ''} onChange={(e) => set('dispositionType', e.target.value || undefined)} className={selectCls}>
                 <option value="">— noch in Pflege —</option>
-                {['vermittelt','weitergeleitet','ausgewildert','verstorben','euthanasiert','unbekannt'].map((v) => (
-                  <option key={v} value={v}>{v}</option>
+                {dispositionTypes.map((d) => (
+                  <option key={d.id} value={d.name}>{d.name}</option>
                 ))}
               </select>
             </Field>

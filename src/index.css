@@ -8,7 +8,12 @@
   --color-nabu-darkorange: hsl(31, 100%, 36%);
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* In @layer base, damit Tailwinds Utility-Layer (p-*, px-* …) korrekt gewinnt.
+   Ungelayerte Regeln schlagen in der CSS-Kaskade jede gelayerte Regel und
+   würden sonst alle Padding-Utilities auf 0 zwingen. */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+}
 
 body {
   font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;

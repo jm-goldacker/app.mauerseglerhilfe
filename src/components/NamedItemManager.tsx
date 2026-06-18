@@ -60,7 +60,7 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="Neuer Eintrag…"
-                className="flex-1 px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors placeholder:text-slate-300"
+                className="flex-1 px-4 py-3 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors placeholder:text-slate-300"
                 style={{ '--tw-ring-color': 'hsl(205, 100%, 35%, 0.3)' } as React.CSSProperties}
               />
               <button
@@ -100,7 +100,7 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
                           onChange={(e) => setEditName(e.target.value)}
                           autoFocus
                           onKeyDown={(e) => { if (e.key === 'Escape') setEditId(null) }}
-                          className="flex-1 px-3 py-1.5 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors"
+                          className="flex-1 px-4 py-2.5 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors"
                           style={{ borderColor: 'hsl(205, 100%, 60%)', '--tw-ring-color': 'hsl(205, 100%, 35%, 0.3)' } as React.CSSProperties}
                         />
                         <button

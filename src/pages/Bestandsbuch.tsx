@@ -140,7 +140,7 @@ export default function Bestandsbuch() {
                 <thead>
                   <tr style={{ background: 'hsl(218, 55%, 95%)', borderBottom: '1px solid hsl(218, 30%, 88%)' }}>
                     {['#', 'Datum', 'Name', 'Vogelart', 'Alter', 'Leistungsart', 'Aufnahme', 'Von', 'PLZ', 'Fundumstand', 'Weiterleitung', 'Verbleib am', 'Verbleib', ''].map((h) => (
-                      <th key={h} className="px-4 py-4 text-left font-medium text-xs uppercase tracking-wide whitespace-nowrap"
+                      <th key={h} className="px-5 py-4 text-left font-medium text-xs uppercase tracking-wide whitespace-nowrap"
                         style={{ color: 'hsl(208, 100%, 30%)' }}>
                         {h}
                       </th>
@@ -160,20 +160,20 @@ export default function Bestandsbuch() {
                         onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'hsl(218, 55%, 97%)')}
                         onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
                       >
-                        <td className="px-4 py-4 text-xs font-mono text-slate-300">{String(entry.id).padStart(3, '0')}</td>
-                        <td className="px-4 py-4 whitespace-nowrap text-slate-600">{formatDate(entry.date)}</td>
-                        <td className="px-4 py-4 font-medium text-slate-900">{entry.name ?? <span className="text-slate-300">—</span>}</td>
-                        <td className="px-4 py-4 text-slate-600">{entry.birdSpecies}</td>
-                        <td className="px-3 py-4"><AgeBadge value={entry.age} /></td>
-                        <td className="px-4 py-4 text-slate-500">{entry.serviceType ?? '—'}</td>
-                        <td className="px-4 py-4 whitespace-nowrap text-slate-500">{formatDate(entry.takenInDate)}</td>
-                        <td className="px-4 py-4 text-slate-600">{entry.takenInBy ?? '—'}</td>
-                        <td className="px-4 py-4 font-mono text-slate-500">{entry.zipFoundAt ?? '—'}</td>
-                        <td className="px-4 py-4 text-slate-500 max-w-48 truncate">{entry.circumstance}</td>
-                        <td className="px-4 py-4 text-slate-500">{entry.careStation ?? entry.redirectedTo ?? '—'}</td>
-                        <td className="px-4 py-4 whitespace-nowrap text-slate-500">{formatDate(verbleibDate)}</td>
-                        <td className="px-3 py-4 whitespace-nowrap">{verbleib ? <VerbleibBadge value={verbleib} /> : <span className="text-slate-300 text-xs whitespace-nowrap">in Pflege</span>}</td>
-                        <td className="px-3 py-4 w-12" onClick={(e) => e.stopPropagation()}>
+                        <td className="px-5 py-4 text-xs font-mono text-slate-300">{String(entry.id).padStart(3, '0')}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-slate-600">{formatDate(entry.date)}</td>
+                        <td className="px-5 py-4 font-medium text-slate-900">{entry.name ?? <span className="text-slate-300">—</span>}</td>
+                        <td className="px-5 py-4 text-slate-600">{entry.birdSpecies}</td>
+                        <td className="px-4 py-4"><AgeBadge value={entry.age} /></td>
+                        <td className="px-5 py-4 text-slate-500">{entry.serviceType ?? '—'}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-slate-500">{formatDate(entry.takenInDate)}</td>
+                        <td className="px-5 py-4 text-slate-600">{entry.takenInBy ?? '—'}</td>
+                        <td className="px-5 py-4 font-mono text-slate-500">{entry.zipFoundAt ?? '—'}</td>
+                        <td className="px-5 py-4 text-slate-500 max-w-48 truncate">{entry.circumstance}</td>
+                        <td className="px-5 py-4 text-slate-500">{entry.careStation ?? entry.redirectedTo ?? '—'}</td>
+                        <td className="px-5 py-4 whitespace-nowrap text-slate-500">{formatDate(verbleibDate)}</td>
+                        <td className="px-4 py-4 whitespace-nowrap">{verbleib ? <VerbleibBadge value={verbleib} /> : <span className="text-slate-300 text-xs whitespace-nowrap">in Pflege</span>}</td>
+                        <td className="px-4 py-4 w-12" onClick={(e) => e.stopPropagation()}>
                           <button
                             onClick={() => navigate(`/eintrag/${entry.id}`)}
                             className="inline-flex items-center justify-center w-7 h-7 rounded-md transition-colors"
