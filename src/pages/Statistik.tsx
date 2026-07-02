@@ -65,6 +65,14 @@ export default function Statistik() {
           </div>
         )}
 
+        {/* Legende */}
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-slate-500 -mt-4">
+          <span><span className="font-semibold" style={{ color: '#dc2626' }}>†</span> verstorben</span>
+          <span><span className="font-semibold" style={{ color: '#16a34a' }}>✓</span> ausgewildert / vermittelt</span>
+          <span><span className="font-semibold" style={{ color: 'hsl(205, 100%, 35%)' }}>⏳</span> in Pflege</span>
+          <span><span className="font-semibold" style={{ color: 'hsl(31, 100%, 47%)' }}>=</span> gesamt aufgenommen (inkl. Pflege)</span>
+        </div>
+
         {/* Species table */}
         {isLoading ? (
           <div className="flex justify-center py-20">
@@ -81,13 +89,13 @@ export default function Statistik() {
                     Vogelart
                   </th>
                   {sortedAges.map((age) => (
-                    <th key={age} colSpan={2}
+                    <th key={age} colSpan={3}
                       className="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wide border-b border-slate-200 border-l border-l-slate-100"
                       style={{ background: 'hsl(218, 55%, 95%)', color: 'hsl(205, 100%, 35%)', minWidth: 80 }}>
                       {age}
                     </th>
                   ))}
-                  <th colSpan={3} className="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wide border-b border-slate-200 border-l-2 border-l-slate-200"
+                  <th colSpan={4} className="px-3 py-2 text-center text-xs font-semibold uppercase tracking-wide border-b border-slate-200 border-l-2 border-l-slate-200"
                     style={{ background: '#f8fafc', color: '#475569' }}>
                     Gesamt
                   </th>
@@ -95,13 +103,15 @@ export default function Statistik() {
                 <tr>
                   {sortedAges.map((age) => (
                     <React.Fragment key={age}>
-                      <th className="px-2 py-2 text-center text-xs font-medium border-b border-slate-200 border-l border-l-slate-100" style={{ background: '#fff8f8', color: '#dc2626' }}>†</th>
-                      <th className="px-2 py-2 text-center text-xs font-medium border-b border-slate-200" style={{ background: '#f0fdf4', color: '#16a34a' }}>✓</th>
+                      <th title="verstorben" className="px-2 py-2 text-center text-xs font-medium border-b border-slate-200 border-l border-l-slate-100" style={{ background: '#fff8f8', color: '#dc2626' }}>†</th>
+                      <th title="ausgewildert / vermittelt" className="px-2 py-2 text-center text-xs font-medium border-b border-slate-200" style={{ background: '#f0fdf4', color: '#16a34a' }}>✓</th>
+                      <th title="in Pflege" className="px-2 py-2 text-center text-xs font-medium border-b border-slate-200" style={{ background: '#eff6ff', color: 'hsl(205, 100%, 35%)' }}>⏳</th>
                     </React.Fragment>
                   ))}
-                  <th className="px-2 py-2 text-center text-xs font-medium border-b border-slate-200 border-l-2 border-l-slate-200" style={{ background: '#fff8f8', color: '#dc2626' }}>†</th>
-                  <th className="px-2 py-2 text-center text-xs font-medium border-b border-slate-200" style={{ background: '#f0fdf4', color: '#16a34a' }}>✓</th>
-                  <th className="px-2 py-2 text-center text-xs font-bold border-b border-slate-200" style={{ color: 'hsl(31, 100%, 47%)' }}>=</th>
+                  <th title="verstorben" className="px-2 py-2 text-center text-xs font-medium border-b border-slate-200 border-l-2 border-l-slate-200" style={{ background: '#fff8f8', color: '#dc2626' }}>†</th>
+                  <th title="ausgewildert / vermittelt" className="px-2 py-2 text-center text-xs font-medium border-b border-slate-200" style={{ background: '#f0fdf4', color: '#16a34a' }}>✓</th>
+                  <th title="in Pflege" className="px-2 py-2 text-center text-xs font-medium border-b border-slate-200" style={{ background: '#eff6ff', color: 'hsl(205, 100%, 35%)' }}>⏳</th>
+                  <th title="gesamt aufgenommen" className="px-2 py-2 text-center text-xs font-bold border-b border-slate-200" style={{ color: 'hsl(31, 100%, 47%)' }}>=</th>
                 </tr>
               </thead>
               <tbody>
@@ -121,11 +131,13 @@ export default function Statistik() {
                           <React.Fragment key={age}>
                             <td className="px-3 py-3.5 text-center border-l border-slate-100" style={{ color: s?.died ? '#dc2626' : '#cbd5e1' }}>{s?.died ?? 0}</td>
                             <td className="px-3 py-3.5 text-center" style={{ color: s?.survived ? '#16a34a' : '#cbd5e1' }}>{s?.survived ?? 0}</td>
+                            <td className="px-3 py-3.5 text-center" style={{ color: s?.inCare ? 'hsl(205, 100%, 35%)' : '#cbd5e1' }}>{s?.inCare ?? 0}</td>
                           </React.Fragment>
                         )
                       })}
                       <td className="px-3 py-3.5 text-center font-semibold border-l-2 border-slate-200" style={{ color: row.totalDied ? '#dc2626' : '#cbd5e1' }}>{row.totalDied}</td>
                       <td className="px-3 py-3.5 text-center font-semibold" style={{ color: row.totalSurvived ? '#16a34a' : '#cbd5e1' }}>{row.totalSurvived}</td>
+                      <td className="px-3 py-3.5 text-center font-semibold" style={{ color: row.totalInCare ? 'hsl(205, 100%, 35%)' : '#cbd5e1' }}>{row.totalInCare}</td>
                       <td className="px-3 py-3.5 text-center font-bold" style={{ color: 'hsl(31, 100%, 47%)' }}>{row.total}</td>
                     </tr>
                   )
@@ -134,6 +146,7 @@ export default function Statistik() {
               {rows.length > 0 && (() => {
                 const td = rows.reduce((s, r) => s + r.totalDied, 0)
                 const ts = rows.reduce((s, r) => s + r.totalSurvived, 0)
+                const tc = rows.reduce((s, r) => s + r.totalInCare, 0)
                 const tt = rows.reduce((s, r) => s + r.total, 0)
                 return (
                   <tfoot>
@@ -142,15 +155,18 @@ export default function Statistik() {
                       {sortedAges.map((age) => {
                         const d = rows.reduce((s, r) => s + (r.ageStats.find((a) => a.age === age)?.died ?? 0), 0)
                         const v = rows.reduce((s, r) => s + (r.ageStats.find((a) => a.age === age)?.survived ?? 0), 0)
+                        const c = rows.reduce((s, r) => s + (r.ageStats.find((a) => a.age === age)?.inCare ?? 0), 0)
                         return (
                           <React.Fragment key={age}>
                             <td className="px-3 py-4 text-center font-semibold border-l border-slate-200" style={{ color: '#dc2626' }}>{d}</td>
                             <td className="px-3 py-4 text-center font-semibold" style={{ color: '#16a34a' }}>{v}</td>
+                            <td className="px-3 py-4 text-center font-semibold" style={{ color: 'hsl(205, 100%, 35%)' }}>{c}</td>
                           </React.Fragment>
                         )
                       })}
                       <td className="px-3 py-4 text-center font-bold border-l-2 border-slate-300" style={{ color: '#dc2626' }}>{td}</td>
                       <td className="px-3 py-4 text-center font-bold" style={{ color: '#16a34a' }}>{ts}</td>
+                      <td className="px-3 py-4 text-center font-bold" style={{ color: 'hsl(205, 100%, 35%)' }}>{tc}</td>
                       <td className="px-3 py-4 text-center font-bold text-lg" style={{ color: 'hsl(31, 100%, 47%)' }}>{tt}</td>
                     </tr>
                   </tfoot>

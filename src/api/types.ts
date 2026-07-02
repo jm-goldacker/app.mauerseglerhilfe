@@ -69,6 +69,7 @@ export interface AgeStatRow {
   age: string
   survived: number
   died: number
+  inCare: number
 }
 
 export interface SpeciesStatRow {
@@ -76,6 +77,7 @@ export interface SpeciesStatRow {
   ageStats: AgeStatRow[]
   totalSurvived: number
   totalDied: number
+  totalInCare: number
   total: number
 }
 
