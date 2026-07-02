@@ -27,6 +27,7 @@ const COLUMNS: Column<LogEntry>[] = [
   { key: 'id', label: '#', get: (e) => e.id },
   { key: 'date', label: 'Datum', get: (e) => e.date },
   { key: 'name', label: 'Name', get: (e) => e.name },
+  { key: 'ringNumber', label: 'Ringnummer', get: (e) => e.ringNumber },
   { key: 'birdSpecies', label: 'Vogelart', get: (e) => e.birdSpecies },
   { key: 'age', label: 'Alter', get: (e) => e.age },
   { key: 'serviceType', label: 'Leistungsart', get: (e) => e.serviceType },
@@ -98,6 +99,7 @@ export default function Bestandsbuch() {
       const q = search.toLowerCase()
       const matchSearch = !q ||
         (e.name ?? '').toLowerCase().includes(q) ||
+        (e.ringNumber ?? '').toLowerCase().includes(q) ||
         e.birdSpecies.toLowerCase().includes(q) ||
         e.circumstance.toLowerCase().includes(q) ||
         (e.zipFoundAt ?? '').includes(q) ||
@@ -135,7 +137,7 @@ export default function Bestandsbuch() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Name, Vogelart, PLZ, Aufgenommen von…"
+            placeholder="Name, Ringnummer, Vogelart, PLZ, Aufgenommen von…"
             className="w-full pl-9 pr-3 py-2 text-sm border border-slate-200 rounded-lg bg-slate-50 focus:outline-none focus:ring-2 focus:bg-white transition-colors"
             style={{ '--tw-ring-color': 'hsl(205, 100%, 35%, 0.3)' } as React.CSSProperties}
           />
@@ -161,7 +163,7 @@ export default function Bestandsbuch() {
             <Skeleton />
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse min-w-[1100px]">
+              <table className="w-full text-sm border-collapse min-w-[1220px]">
                 <TableHead columns={COLUMNS} sort={sort} toggleSort={toggleSort} filters={filters} setFilter={setFilter} showFilters={showFilters} trailing={1} />
                 <tbody>
                   {filtered.map((entry) => {
@@ -179,6 +181,7 @@ export default function Bestandsbuch() {
                         <td className="px-5 py-4 text-xs font-mono text-slate-300">{String(entry.id).padStart(3, '0')}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-slate-600">{formatDate(entry.date)}</td>
                         <td className="px-5 py-4 font-medium text-slate-900">{entry.name ?? <span className="text-slate-300">—</span>}</td>
+                        <td className="px-5 py-4 font-mono text-slate-600">{entry.ringNumber ?? <span className="font-sans text-slate-300">—</span>}</td>
                         <td className="px-5 py-4 text-slate-600">{entry.birdSpecies}</td>
                         <td className="px-4 py-4"><AgeBadge value={entry.age} /></td>
                         <td className="px-5 py-4 text-slate-500">{entry.serviceType ?? '—'}</td>

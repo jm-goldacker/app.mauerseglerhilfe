@@ -75,6 +75,7 @@ export default function LogEntryForm() {
       setForm({
         date: toInputDate(entry.date),
         name: entry.name,
+        ringNumber: entry.ringNumber,
         age: entry.age,
         birdSpecies: entry.birdSpecies,
         circumstance: entry.circumstance,
@@ -214,6 +215,15 @@ export default function LogEntryForm() {
             </Field>
             <Field label="Name">
               <input value={form.name ?? ''} onChange={(e) => set('name', e.target.value)} placeholder="z. B. Piepsi…" className={inputCls} />
+            </Field>
+            <Field label="Ringnummer">
+              <input
+                value={form.ringNumber ?? ''}
+                onChange={(e) => set('ringNumber', e.target.value)}
+                maxLength={50}
+                placeholder="z. B. DEW 1A234…"
+                className={inputCls}
+              />
             </Field>
             <Field label="Alter" required>
               <select required value={form.age} onChange={(e) => set('age', e.target.value)} className={selectCls}>
