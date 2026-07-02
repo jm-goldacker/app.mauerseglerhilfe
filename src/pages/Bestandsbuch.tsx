@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { logEntriesApi } from '../api/queries'
 import type { LogEntry } from '../api/types'
 import { PlusIcon, SearchIcon, EditIcon } from '../components/Icons'
+import { type Column, useTableControls, useSortedRows, TableHead, FilterToggle } from '../components/tableControls'
 
 function formatDate(d?: string) {
   if (!d) return '—'
@@ -17,6 +18,26 @@ function getVerbleib(entry: LogEntry) {
   if (entry.letFreeDate) return 'ausgewildert'
   return null
 }
+
+function getVerbleibDate(entry: LogEntry) {
+  return entry.letFreeDate || entry.diedDate || entry.euthanasiaDate
+}
+
+const COLUMNS: Column<LogEntry>[] = [
+  { key: 'id', label: '#', get: (e) => e.id },
+  { key: 'date', label: 'Datum', get: (e) => e.date },
+  { key: 'name', label: 'Name', get: (e) => e.name },
+  { key: 'birdSpecies', label: 'Vogelart', get: (e) => e.birdSpecies },
+  { key: 'age', label: 'Alter', get: (e) => e.age },
+  { key: 'serviceType', label: 'Leistungsart', get: (e) => e.serviceType },
+  { key: 'takenInDate', label: 'Aufnahme', get: (e) => e.takenInDate },
+  { key: 'takenInBy', label: 'Von', get: (e) => e.takenInBy },
+  { key: 'zipFoundAt', label: 'PLZ', get: (e) => e.zipFoundAt },
+  { key: 'circumstance', label: 'Fundumstand', get: (e) => e.circumstance },
+  { key: 'redirect', label: 'Weiterleitung', get: (e) => e.careStation ?? e.redirectedTo },
+  { key: 'verbleibDate', label: 'Verbleib am', get: (e) => getVerbleibDate(e) },
+  { key: 'verbleib', label: 'Verbleib', get: (e) => getVerbleib(e) },
+]
 
 const verbleibStyle: Record<string, { bg: string; text: string; dot: string }> = {
   'ausgewildert':  { bg: '#ecfdf5', text: '#065f46', dot: '#10b981' },
@@ -68,10 +89,11 @@ export default function Bestandsbuch() {
   const { data: entries = [], isLoading } = useQuery({ queryKey: ['logEntries'], queryFn: logEntriesApi.getAll })
   const [search, setSearch] = useState('')
   const [filterYear, setFilterYear] = useState('')
+  const { sort, toggleSort, filters, setFilter, clearFilters, showFilters, setShowFilters, activeFilters } = useTableControls()
 
   const years = [...new Set(entries.map((e) => new Date(e.date).getFullYear()))].sort((a, b) => b - a)
 
-  const filtered = entries
+  const searched = entries
     .filter((e) => {
       const q = search.toLowerCase()
       const matchSearch = !q ||
@@ -83,6 +105,8 @@ export default function Bestandsbuch() {
       return matchSearch && (!filterYear || new Date(e.date).getFullYear() === Number(filterYear))
     })
     .sort((a, b) => a.id - b.id)
+
+  const filtered = useSortedRows(searched, COLUMNS, sort, filters)
 
   return (
     <div className="flex flex-col h-full">
@@ -124,7 +148,8 @@ export default function Bestandsbuch() {
           <option value="">Alle Jahre</option>
           {years.map((y) => <option key={y} value={y}>{y}</option>)}
         </select>
-        {(search || filterYear) && (
+        <FilterToggle showFilters={showFilters} setShowFilters={setShowFilters} activeFilters={activeFilters} onClear={clearFilters} />
+        {(search || filterYear || activeFilters > 0 || sort.key) && (
           <span className="text-sm text-slate-500 whitespace-nowrap">{filtered.length} Treffer</span>
         )}
       </div>
@@ -137,20 +162,11 @@ export default function Bestandsbuch() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse min-w-[1100px]">
-                <thead>
-                  <tr style={{ background: 'hsl(218, 55%, 95%)', borderBottom: '1px solid hsl(218, 30%, 88%)' }}>
-                    {['#', 'Datum', 'Name', 'Vogelart', 'Alter', 'Leistungsart', 'Aufnahme', 'Von', 'PLZ', 'Fundumstand', 'Weiterleitung', 'Verbleib am', 'Verbleib', ''].map((h) => (
-                      <th key={h} className="px-5 py-4 text-left font-medium text-xs uppercase tracking-wide whitespace-nowrap"
-                        style={{ color: 'hsl(208, 100%, 30%)' }}>
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
+                <TableHead columns={COLUMNS} sort={sort} toggleSort={toggleSort} filters={filters} setFilter={setFilter} showFilters={showFilters} trailing={1} />
                 <tbody>
                   {filtered.map((entry) => {
                     const verbleib = getVerbleib(entry)
-                    const verbleibDate = entry.letFreeDate || entry.diedDate || entry.euthanasiaDate
+                    const verbleibDate = getVerbleibDate(entry)
                     return (
                       <tr
                         key={entry.id}

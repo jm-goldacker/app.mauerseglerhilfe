@@ -4,10 +4,22 @@ import { tripLogsApi } from '../api/queries'
 import type { TripLog, TripLogPost } from '../api/types'
 import { hasRole } from '../auth/keycloak'
 import { PlusIcon, EditIcon, TrashIcon, XIcon, CheckIcon } from '../components/Icons'
+import { type Column, useTableControls, useSortedRows, TableHead, FilterToggle } from '../components/tableControls'
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
 }
+
+const COLUMNS: Column<TripLog>[] = [
+  { key: 'id', label: '#', get: (t) => t.id },
+  { key: 'date', label: 'Datum', get: (t) => t.date },
+  { key: 'driver', label: 'Fahrer', get: (t) => t.driver },
+  { key: 'startLocation', label: 'Start', get: (t) => t.startLocation },
+  { key: 'endLocation', label: 'Ziel', get: (t) => t.endLocation },
+  { key: 'purpose', label: 'Zweck', get: (t) => t.purpose },
+  { key: 'distanceKm', label: 'km', get: (t) => t.distanceKm, align: 'right' },
+  { key: 'notes', label: 'Bemerkungen', get: (t) => t.notes },
+]
 
 const EMPTY: TripLogPost = {
   date: new Date().toISOString().substring(0, 10),
@@ -24,6 +36,9 @@ export default function Fahrtenbuch() {
   const [showForm, setShowForm] = useState(false)
   const [editTrip, setEditTrip] = useState<TripLog | null>(null)
   const [form, setForm] = useState<TripLogPost>(EMPTY)
+
+  const { sort, toggleSort, filters, setFilter, clearFilters, showFilters, setShowFilters, activeFilters } = useTableControls()
+  const sorted = useSortedRows(trips, COLUMNS, sort, filters)
 
   const createMut = useMutation({
     mutationFn: tripLogsApi.create,
@@ -152,6 +167,16 @@ export default function Fahrtenbuch() {
           </div>
         )}
 
+        {/* Toolbar */}
+        {!isLoading && trips.length > 0 && (
+          <div className="flex items-center gap-3 -mb-4">
+            <FilterToggle showFilters={showFilters} setShowFilters={setShowFilters} activeFilters={activeFilters} onClear={clearFilters} />
+            {(activeFilters > 0 || sort.key) && (
+              <span className="text-sm text-slate-500 whitespace-nowrap">{sorted.length} von {trips.length}</span>
+            )}
+          </div>
+        )}
+
         {/* Table */}
         <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
           {isLoading ? (
@@ -162,16 +187,9 @@ export default function Fahrtenbuch() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse min-w-[700px]">
-                <thead>
-                  <tr style={{ background: 'hsl(218, 55%, 95%)', borderBottom: '1px solid hsl(218, 30%, 88%)' }}>
-                    {['#', 'Datum', 'Fahrer', 'Start', 'Ziel', 'Zweck', 'km', 'Bemerkungen', ''].map((h) => (
-                      <th key={h} className="px-4 py-4 text-left text-xs font-medium uppercase tracking-wide"
-                        style={{ color: 'hsl(208, 100%, 30%)' }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
+                <TableHead columns={COLUMNS} sort={sort} toggleSort={toggleSort} filters={filters} setFilter={setFilter} showFilters={showFilters} trailing={1} />
                 <tbody>
-                  {trips.map((trip) => (
+                  {sorted.map((trip) => (
                     <tr key={trip.id} className="border-b transition-colors" style={{ borderColor: '#f1f5f9' }}
                       onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'hsl(218, 55%, 97%)')}
                       onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'transparent')}
@@ -207,12 +225,12 @@ export default function Fahrtenbuch() {
                     </tr>
                   ))}
                 </tbody>
-                {trips.length > 1 && (
+                {sorted.length > 1 && (
                   <tfoot>
                     <tr style={{ background: 'hsl(218, 55%, 95%)', borderTop: '2px solid hsl(218, 30%, 85%)' }}>
                       <td colSpan={6} className="px-4 py-3 text-right text-sm font-semibold text-slate-600">Gesamt</td>
                       <td className="px-4 py-3 text-right font-bold whitespace-nowrap" style={{ color: 'hsl(31, 100%, 47%)' }}>
-                        {totalKm.toFixed(1)} km
+                        {sorted.reduce((s, t) => s + t.distanceKm, 0).toFixed(1)} km
                       </td>
                       <td colSpan={2} />
                     </tr>
@@ -225,6 +243,12 @@ export default function Fahrtenbuch() {
             <div className="flex flex-col items-center justify-center py-20 text-slate-400">
               <p className="font-medium">Noch keine Fahrten erfasst</p>
               <p className="text-sm mt-1">Mit „Neue Fahrt" beginnen</p>
+            </div>
+          )}
+          {!isLoading && trips.length > 0 && sorted.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-20 text-slate-400">
+              <p className="font-medium">Keine Fahrten gefunden</p>
+              <p className="text-sm mt-1">Filter anpassen</p>
             </div>
           )}
         </div>
