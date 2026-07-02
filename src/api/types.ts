@@ -8,6 +8,7 @@ export interface LogEntry {
   date: string
   name?: string
   ringNumber?: string
+  finderName?: string
   age: string
   birdSpecies: string
   circumstance: string
@@ -27,6 +28,7 @@ export interface LogEntryPost {
   date: string
   name?: string
   ringNumber?: string
+  finderName?: string
   age: string
   birdSpecies: string
   circumstance: string

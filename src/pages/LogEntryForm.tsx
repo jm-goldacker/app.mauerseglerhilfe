@@ -76,6 +76,7 @@ export default function LogEntryForm() {
         date: toInputDate(entry.date),
         name: entry.name,
         ringNumber: entry.ringNumber,
+        finderName: entry.finderName,
         age: entry.age,
         birdSpecies: entry.birdSpecies,
         circumstance: entry.circumstance,
@@ -225,6 +226,9 @@ export default function LogEntryForm() {
                 className={inputCls}
               />
             </Field>
+            <Field label="Findername">
+              <input value={form.finderName ?? ''} onChange={(e) => set('finderName', e.target.value)} placeholder="Name der Finderin/des Finders…" className={inputCls} />
+            </Field>
             <Field label="Alter" required>
               <select required value={form.age} onChange={(e) => set('age', e.target.value)} className={selectCls}>
                 <option value="">— Alter wählen —</option>
@@ -260,6 +264,12 @@ export default function LogEntryForm() {
             <Field label="Aufgenommen von">
               <input value={form.takenInBy ?? ''} onChange={(e) => set('takenInBy', e.target.value)} placeholder="Name…" className={inputCls} />
             </Field>
+            <Field label="Pflegestelle">
+              <select value={form.careStation ?? ''} onChange={(e) => set('careStation', e.target.value || undefined)} className={selectCls}>
+                <option value="">— keine —</option>
+                {careStations.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
+              </select>
+            </Field>
           </Section>
 
           <Section title="Verbleib" icon="🏁">
@@ -271,14 +281,11 @@ export default function LogEntryForm() {
                 ))}
               </select>
             </Field>
-            <Field label="Pflegestelle">
-              <select value={form.careStation ?? ''} onChange={(e) => set('careStation', e.target.value || undefined)} className={selectCls}>
+            <Field label="Weiterleitung an">
+              <select value={form.redirectedTo ?? ''} onChange={(e) => set('redirectedTo', e.target.value || undefined)} className={selectCls}>
                 <option value="">— keine —</option>
                 {careStations.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}
               </select>
-            </Field>
-            <Field label="Weiterleitung (Freitext)">
-              <input value={form.redirectedTo ?? ''} onChange={(e) => set('redirectedTo', e.target.value)} placeholder="Freitext…" className={inputCls} />
             </Field>
             <Field label="Freilassung am">
               <input type="date" value={form.letFreeDate ?? ''} onChange={(e) => set('letFreeDate', e.target.value)} className={inputCls} />

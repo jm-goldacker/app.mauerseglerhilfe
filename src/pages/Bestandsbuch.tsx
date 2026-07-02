@@ -33,9 +33,10 @@ const COLUMNS: Column<LogEntry>[] = [
   { key: 'serviceType', label: 'Leistungsart', get: (e) => e.serviceType },
   { key: 'takenInDate', label: 'Aufnahme', get: (e) => e.takenInDate },
   { key: 'takenInBy', label: 'Von', get: (e) => e.takenInBy },
+  { key: 'careStation', label: 'Pflegestelle', get: (e) => e.careStation },
   { key: 'zipFoundAt', label: 'PLZ', get: (e) => e.zipFoundAt },
   { key: 'circumstance', label: 'Fundumstand', get: (e) => e.circumstance },
-  { key: 'redirect', label: 'Weiterleitung', get: (e) => e.careStation ?? e.redirectedTo },
+  { key: 'redirectedTo', label: 'Weiterleitung', get: (e) => e.redirectedTo },
   { key: 'verbleibDate', label: 'Verbleib am', get: (e) => getVerbleibDate(e) },
   { key: 'verbleib', label: 'Verbleib', get: (e) => getVerbleib(e) },
 ]
@@ -163,7 +164,7 @@ export default function Bestandsbuch() {
             <Skeleton />
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse min-w-[1220px]">
+              <table className="w-full text-sm border-collapse min-w-[1340px]">
                 <TableHead columns={COLUMNS} sort={sort} toggleSort={toggleSort} filters={filters} setFilter={setFilter} showFilters={showFilters} trailing={1} />
                 <tbody>
                   {filtered.map((entry) => {
@@ -187,9 +188,10 @@ export default function Bestandsbuch() {
                         <td className="px-5 py-4 text-slate-500">{entry.serviceType ?? '—'}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-slate-500">{formatDate(entry.takenInDate)}</td>
                         <td className="px-5 py-4 text-slate-600">{entry.takenInBy ?? '—'}</td>
+                        <td className="px-5 py-4 text-slate-500">{entry.careStation ?? '—'}</td>
                         <td className="px-5 py-4 font-mono text-slate-500">{entry.zipFoundAt ?? '—'}</td>
                         <td className="px-5 py-4 text-slate-500 max-w-48 truncate">{entry.circumstance}</td>
-                        <td className="px-5 py-4 text-slate-500">{entry.careStation ?? entry.redirectedTo ?? '—'}</td>
+                        <td className="px-5 py-4 text-slate-500">{entry.redirectedTo ?? '—'}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-slate-500">{formatDate(verbleibDate)}</td>
                         <td className="px-4 py-4 whitespace-nowrap">{verbleib ? <VerbleibBadge value={verbleib} /> : <span className="text-slate-300 text-xs whitespace-nowrap">in Pflege</span>}</td>
                         <td className="px-4 py-4 w-12" onClick={(e) => e.stopPropagation()}>
