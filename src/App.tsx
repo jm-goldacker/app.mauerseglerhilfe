@@ -10,6 +10,7 @@ import Fundumstaende from './pages/stammdaten/Fundumstaende'
 import Leistungsarten from './pages/stammdaten/Leistungsarten'
 import Verbleib from './pages/stammdaten/Verbleib'
 import Pflegestellen from './pages/stammdaten/Pflegestellen'
+import Vermittler from './pages/stammdaten/Vermittler'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,6 +36,7 @@ export default function App() {
             <Route path="/stammdaten/leistungsarten" element={<Leistungsarten />} />
             <Route path="/stammdaten/verbleib" element={<Verbleib />} />
             <Route path="/stammdaten/pflegestellen" element={<Pflegestellen />} />
+            <Route path="/stammdaten/vermittler" element={<Vermittler />} />
           </Routes>
         </Layout>
       </BrowserRouter>

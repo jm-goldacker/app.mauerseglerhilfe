@@ -31,6 +31,7 @@ const COLUMNS: Column<LogEntry>[] = [
   { key: 'birdSpecies', label: 'Vogelart', get: (e) => e.birdSpecies },
   { key: 'age', label: 'Alter', get: (e) => e.age },
   { key: 'serviceType', label: 'Leistungsart', get: (e) => e.serviceType },
+  { key: 'referrer', label: 'Vermittelt durch', get: (e) => e.referrer },
   { key: 'takenInDate', label: 'Aufnahme', get: (e) => e.takenInDate },
   { key: 'takenInBy', label: 'Von', get: (e) => e.takenInBy },
   { key: 'careStation', label: 'Pflegestelle', get: (e) => e.careStation },
@@ -104,7 +105,8 @@ export default function Bestandsbuch() {
         e.birdSpecies.toLowerCase().includes(q) ||
         e.circumstance.toLowerCase().includes(q) ||
         (e.zipFoundAt ?? '').includes(q) ||
-        (e.takenInBy ?? '').toLowerCase().includes(q)
+        (e.takenInBy ?? '').toLowerCase().includes(q) ||
+        (e.referrer ?? '').toLowerCase().includes(q)
       return matchSearch && (!filterYear || new Date(e.date).getFullYear() === Number(filterYear))
     })
     .sort((a, b) => a.id - b.id)
@@ -164,7 +166,7 @@ export default function Bestandsbuch() {
             <Skeleton />
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse min-w-[1340px]">
+              <table className="w-full text-sm border-collapse min-w-[1460px]">
                 <TableHead columns={COLUMNS} sort={sort} toggleSort={toggleSort} filters={filters} setFilter={setFilter} showFilters={showFilters} trailing={1} />
                 <tbody>
                   {filtered.map((entry) => {
@@ -186,6 +188,7 @@ export default function Bestandsbuch() {
                         <td className="px-5 py-4 text-slate-600">{entry.birdSpecies}</td>
                         <td className="px-4 py-4"><AgeBadge value={entry.age} /></td>
                         <td className="px-5 py-4 text-slate-500">{entry.serviceType ?? '—'}</td>
+                        <td className="px-5 py-4 text-slate-500">{entry.referrer ?? '—'}</td>
                         <td className="px-5 py-4 whitespace-nowrap text-slate-500">{formatDate(entry.takenInDate)}</td>
                         <td className="px-5 py-4 text-slate-600">{entry.takenInBy ?? '—'}</td>
                         <td className="px-5 py-4 text-slate-500">{entry.careStation ?? '—'}</td>

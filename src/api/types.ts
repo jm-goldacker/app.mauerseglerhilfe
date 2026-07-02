@@ -15,6 +15,7 @@ export interface LogEntry {
   serviceType?: string
   dispositionType?: string
   careStation?: string
+  referrer?: string
   takenInDate?: string
   takenInBy?: string
   zipFoundAt?: string
@@ -35,6 +36,7 @@ export interface LogEntryPost {
   serviceType?: string
   dispositionType?: string
   careStation?: string
+  referrer?: string
   takenInDate?: string
   takenInBy?: string
   zipFoundAt?: string

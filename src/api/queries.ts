@@ -53,6 +53,14 @@ export const careStationsApi = {
   delete: (id: number) => api.delete(`/CareStations/${id}`),
 }
 
+// Referrers (vermittelt durch)
+export const referrersApi = {
+  getAll: () => api.get<NamedItem[]>('/Referrers'),
+  create: (name: string) => api.post<NamedItem>('/Referrers', { name }),
+  update: (id: number, name: string) => api.put(`/Referrers/${id}`, { name }),
+  delete: (id: number) => api.delete(`/Referrers/${id}`),
+}
+
 // TripLogs
 export const tripLogsApi = {
   getAll: () => api.get<TripLog[]>('/TripLogs'),

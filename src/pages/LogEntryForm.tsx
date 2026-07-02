@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   logEntriesApi, birdSpeciesApi, circumstancesApi,
-  serviceTypesApi, dispositionTypesApi, careStationsApi
+  serviceTypesApi, dispositionTypesApi, careStationsApi, referrersApi
 } from '../api/queries'
 import type { LogEntryPost } from '../api/types'
 import { hasRole } from '../auth/keycloak'
@@ -69,6 +69,7 @@ export default function LogEntryForm() {
   const { data: serviceTypes = [] } = useQuery({ queryKey: ['serviceTypes'], queryFn: serviceTypesApi.getAll })
   const { data: dispositionTypes = [] } = useQuery({ queryKey: ['dispositionTypes'], queryFn: dispositionTypesApi.getAll })
   const { data: careStations = [] } = useQuery({ queryKey: ['careStations'], queryFn: careStationsApi.getAll })
+  const { data: referrers = [] } = useQuery({ queryKey: ['referrers'], queryFn: referrersApi.getAll })
 
   useEffect(() => {
     if (entry) {
@@ -83,6 +84,7 @@ export default function LogEntryForm() {
         serviceType: entry.serviceType,
         dispositionType: entry.dispositionType,
         careStation: entry.careStation,
+        referrer: entry.referrer,
         takenInDate: toInputDate(entry.takenInDate),
         takenInBy: entry.takenInBy,
         zipFoundAt: entry.zipFoundAt,
@@ -241,6 +243,12 @@ export default function LogEntryForm() {
               <select value={form.serviceType ?? ''} onChange={(e) => set('serviceType', e.target.value || undefined)} className={selectCls}>
                 <option value="">— keine —</option>
                 {serviceTypes.map((s) => <option key={s.id} value={s.name}>{s.name}</option>)}
+              </select>
+            </Field>
+            <Field label="Vermittelt durch">
+              <select value={form.referrer ?? ''} onChange={(e) => set('referrer', e.target.value || undefined)} className={selectCls}>
+                <option value="">— keine —</option>
+                {referrers.map((r) => <option key={r.id} value={r.name}>{r.name}</option>)}
               </select>
             </Field>
           </Section>

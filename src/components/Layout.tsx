@@ -27,6 +27,7 @@ const navItems = [
       { path: '/stammdaten/leistungsarten', label: 'Leistungsarten' },
       { path: '/stammdaten/verbleib', label: 'Verbleib' },
       { path: '/stammdaten/pflegestellen', label: 'Pflegestellen' },
+      { path: '/stammdaten/vermittler', label: 'Vermittler' },
     ],
   },
 ]
