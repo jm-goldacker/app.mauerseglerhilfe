@@ -198,7 +198,7 @@ export default function LogEntryForm() {
 
         <form onSubmit={handleSubmit} className="max-w-3xl" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           <Section title="Basisdaten" icon="📋">
-            <Field label="Meldedatum" required>
+            <Field label="Fundtag" required>
               <input type="date" required value={form.date} onChange={(e) => set('date', e.target.value)} className={inputCls}
                 style={{ '--tw-ring-color': 'hsl(205, 100%, 35%, 0.3)', '--tw-border-color-focus': 'hsl(205, 100%, 35%)' } as React.CSSProperties} />
             </Field>
