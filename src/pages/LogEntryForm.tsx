@@ -113,6 +113,7 @@ export default function LogEntryForm() {
   const deleteMut = useMutation({
     mutationFn: () => logEntriesApi.delete(Number(id)),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['logEntries'] }); navigate('/') },
+    onError: (e: Error) => setError(`Löschen fehlgeschlagen: ${e.message}`),
   })
 
   function set(field: keyof LogEntryPost, value: string | undefined) {

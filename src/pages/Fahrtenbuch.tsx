@@ -40,17 +40,22 @@ export default function Fahrtenbuch() {
   const { sort, toggleSort, filters, setFilter, clearFilters, showFilters, setShowFilters, activeFilters } = useTableControls()
   const sorted = useSortedRows(trips, COLUMNS, sort, filters)
 
+  const [error, setError] = useState('')
+
   const createMut = useMutation({
     mutationFn: tripLogsApi.create,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['tripLogs'] }); setShowForm(false); setForm(EMPTY) },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['tripLogs'] }); setShowForm(false); setForm(EMPTY); setError('') },
+    onError: (e: Error) => setError(`Erfassen fehlgeschlagen: ${e.message}`),
   })
   const updateMut = useMutation({
     mutationFn: ({ id, data }: { id: number; data: TripLogPost }) => tripLogsApi.update(id, data),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['tripLogs'] }); setEditTrip(null) },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['tripLogs'] }); setEditTrip(null); setError('') },
+    onError: (e: Error) => setError(`Speichern fehlgeschlagen: ${e.message}`),
   })
   const deleteMut = useMutation({
     mutationFn: tripLogsApi.delete,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['tripLogs'] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['tripLogs'] }); setError('') },
+    onError: (e: Error) => setError(`Löschen fehlgeschlagen: ${e.message}`),
   })
 
   const totalKm = trips.reduce((s, t) => s + t.distanceKm, 0)
@@ -93,6 +98,12 @@ export default function Fahrtenbuch() {
       </div>
 
       <div className="flex-1 overflow-auto" style={{ padding: '36px 48px', display: 'flex', flexDirection: 'column', gap: 32 }}>
+        {error && (
+          <div className="px-4 py-3 rounded-lg text-sm border -mb-4" style={{ background: '#fff1f2', color: '#be123c', borderColor: '#fecdd3' }}>
+            {error}
+          </div>
+        )}
+
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3 sm:gap-4">
           {[

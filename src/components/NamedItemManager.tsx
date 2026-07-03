@@ -22,20 +22,24 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
 
   const createMut = useMutation({
     mutationFn: create,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: [queryKey] }); setNewName('') },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: [queryKey] }); setNewName(''); setError('') },
+    onError: (e: Error) => setError(`Anlegen fehlgeschlagen: ${e.message}`),
   })
   const updateMut = useMutation({
     mutationFn: ({ id, name }: { id: number; name: string }) => update(id, name),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: [queryKey] }); setEditId(null) },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: [queryKey] }); setEditId(null); setError('') },
+    onError: (e: Error) => setError(`Speichern fehlgeschlagen: ${e.message}`),
   })
   const deleteMut = useMutation({
     mutationFn: remove,
-    onSuccess: () => qc.invalidateQueries({ queryKey: [queryKey] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: [queryKey] }); setError('') },
+    onError: (e: Error) => setError(`Löschen fehlgeschlagen: ${e.message}`),
   })
 
   const [newName, setNewName] = useState('')
   const [editId, setEditId] = useState<number | null>(null)
   const [editName, setEditName] = useState('')
+  const [error, setError] = useState('')
 
   return (
     <div className="flex flex-col h-full">
@@ -50,6 +54,12 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
 
       <div className="flex-1 overflow-auto" style={{ padding: '36px 48px' }}>
         <div className="max-w-lg" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {error && (
+            <div className="px-4 py-3 rounded-lg text-sm border" style={{ background: '#fff1f2', color: '#be123c', borderColor: '#fecdd3' }}>
+              {error}
+            </div>
+          )}
+
           {/* Add form */}
           {isManager && (
             <form
