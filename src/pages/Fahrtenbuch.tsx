@@ -5,6 +5,7 @@ import type { TripLog, TripLogPost } from '../api/types'
 import { hasRole } from '../auth/keycloak'
 import { PlusIcon, EditIcon, TrashIcon, XIcon, CheckIcon } from '../components/Icons'
 import { type Column, useTableControls, useSortedRows, TableHead, FilterToggle } from '../components/tableControls'
+import QueryError from '../components/QueryError'
 
 function formatDate(d: string) {
   // Datumswerte sind als UTC-Mitternacht gespeichert - in UTC formatieren,
@@ -40,7 +41,7 @@ const inputCls = "w-full px-3 py-2 text-sm border border-slate-200 rounded-lg bg
 export default function Fahrtenbuch() {
   const qc = useQueryClient()
   const isManager = hasRole('manager')
-  const { data: trips = [], isLoading } = useQuery({ queryKey: ['tripLogs'], queryFn: tripLogsApi.getAll })
+  const { data: trips = [], isLoading, isError, error: loadError, refetch } = useQuery({ queryKey: ['tripLogs'], queryFn: tripLogsApi.getAll })
 
   const [showForm, setShowForm] = useState(false)
   const [editTrip, setEditTrip] = useState<TripLog | null>(null)
@@ -204,6 +205,8 @@ export default function Fahrtenbuch() {
               <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin"
                 style={{ borderColor: 'hsl(205, 100%, 35%)', borderTopColor: 'transparent' }} />
             </div>
+          ) : isError ? (
+            <QueryError message={loadError?.message} onRetry={() => refetch()} />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse min-w-[700px]">
@@ -259,7 +262,7 @@ export default function Fahrtenbuch() {
               </table>
             </div>
           )}
-          {!isLoading && trips.length === 0 && (
+          {!isLoading && !isError && trips.length === 0 && (
             <div className="flex flex-col items-center justify-center py-20 text-slate-400">
               <p className="font-medium">Noch keine Fahrten erfasst</p>
               <p className="text-sm mt-1">Mit „Neue Fahrt" beginnen</p>

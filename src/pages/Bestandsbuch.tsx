@@ -5,6 +5,7 @@ import { logEntriesApi } from '../api/queries'
 import type { LogEntry } from '../api/types'
 import { PlusIcon, SearchIcon, EditIcon } from '../components/Icons'
 import { type Column, useTableControls, useSortedRows, TableHead, FilterToggle } from '../components/tableControls'
+import QueryError from '../components/QueryError'
 
 function formatDate(d?: string) {
   if (!d) return '—'
@@ -91,7 +92,7 @@ function Skeleton() {
 
 export default function Bestandsbuch() {
   const navigate = useNavigate()
-  const { data: entries = [], isLoading } = useQuery({ queryKey: ['logEntries'], queryFn: logEntriesApi.getAll })
+  const { data: entries = [], isLoading, isError, error: loadError, refetch } = useQuery({ queryKey: ['logEntries'], queryFn: logEntriesApi.getAll })
   const [search, setSearch] = useState('')
   const [filterYear, setFilterYear] = useState('')
   const { sort, toggleSort, filters, setFilter, clearFilters, showFilters, setShowFilters, activeFilters } = useTableControls()
@@ -170,6 +171,8 @@ export default function Bestandsbuch() {
         <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
           {isLoading ? (
             <Skeleton />
+          ) : isError ? (
+            <QueryError message={loadError?.message} onRetry={() => refetch()} />
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse min-w-[1460px]">
@@ -221,7 +224,7 @@ export default function Bestandsbuch() {
               </table>
             </div>
           )}
-          {!isLoading && filtered.length === 0 && (
+          {!isLoading && !isError && filtered.length === 0 && (
             <div className="flex flex-col items-center justify-center py-20" style={{ color: 'hsl(208, 30%, 60%)' }}>
               <SearchIcon size={36} className="mb-3 opacity-30" />
               <p className="font-medium">Keine Einträge gefunden</p>

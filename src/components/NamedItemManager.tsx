@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { NamedItem } from '../api/types'
 import { hasRole } from '../auth/keycloak'
 import { PlusIcon, EditIcon, TrashIcon, CheckIcon, XIcon } from './Icons'
+import QueryError from './QueryError'
 
 interface Props {
   title: string
@@ -18,7 +19,7 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
   const qc = useQueryClient()
   const isManager = hasRole('manager')
 
-  const { data = [], isLoading } = useQuery({ queryKey: [queryKey], queryFn: fetchAll })
+  const { data = [], isLoading, isError, error: loadError, refetch } = useQuery({ queryKey: [queryKey], queryFn: fetchAll })
 
   const createMut = useMutation({
     mutationFn: create,
@@ -95,6 +96,8 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
                   <div key={i} className="h-11 rounded-lg animate-pulse" style={{ background: 'hsl(218, 55%, 91%)' }} />
                 ))}
               </div>
+            ) : isError ? (
+              <QueryError message={loadError?.message} onRetry={() => refetch()} />
             ) : data.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-slate-400">
                 <p className="text-sm">Noch keine Einträge vorhanden</p>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { statisticsApi } from '../api/queries'
+import QueryError from '../components/QueryError'
 
 const AGE_ORDER = ['Küken', 'Jungvogel', 'Altvogel']
 
@@ -18,7 +19,7 @@ export default function Statistik() {
   const [year, setYear] = useState<number | undefined>()
 
   const { data: years = [] } = useQuery({ queryKey: ['statYears'], queryFn: statisticsApi.getYears })
-  const { data: rows = [], isLoading } = useQuery({
+  const { data: rows = [], isLoading, isError, error: loadError, refetch } = useQuery({
     queryKey: ['statSpecies', year],
     queryFn: () => statisticsApi.getSpeciesByAge(year),
   })
@@ -78,6 +79,10 @@ export default function Statistik() {
           <div className="flex justify-center py-20">
             <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin"
               style={{ borderColor: 'hsl(205, 100%, 35%)', borderTopColor: 'transparent' }} />
+          </div>
+        ) : isError ? (
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
+            <QueryError message={loadError?.message} onRetry={() => refetch()} />
           </div>
         ) : (
           <div className="bg-white rounded-xl border border-slate-200 overflow-auto shadow-sm">
