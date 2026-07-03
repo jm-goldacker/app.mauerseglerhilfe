@@ -125,7 +125,7 @@ export default function Statistik() {
                   return (
                     <tr key={row.birdSpecies}
                       className="border-b transition-colors"
-                      style={{ borderColor: '#f1f5f9' }}
+                      style={{ borderColor: '#f1f5f9', background: i % 2 === 0 ? 'white' : '#fafafa' }}
                       onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'hsl(218, 55%, 97%)')}
                       onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = i % 2 === 0 ? 'white' : '#fafafa')}
                     >

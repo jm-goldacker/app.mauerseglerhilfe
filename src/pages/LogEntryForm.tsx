@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
@@ -72,11 +72,11 @@ export default function LogEntryForm() {
 
   // Formular nur einmal aus dem geladenen Eintrag befüllen: Background-Refetches
   // (z. B. bei Fenster-Fokus) dürfen ungespeicherte Eingaben nicht überschreiben.
-  const seededRef = useRef(false)
-  useEffect(() => {
-    if (entry && !seededRef.current) {
-      seededRef.current = true
-      setForm({
+  // Render-Phase-Update statt Effect (vgl. react.dev "You Might Not Need an Effect").
+  const [seeded, setSeeded] = useState(false)
+  if (entry && !seeded) {
+    setSeeded(true)
+    setForm({
         date: toInputDate(entry.date),
         name: entry.name,
         ringNumber: entry.ringNumber,
@@ -95,9 +95,8 @@ export default function LogEntryForm() {
         letFreeDate: toInputDate(entry.letFreeDate),
         diedDate: toInputDate(entry.diedDate),
         euthanasiaDate: toInputDate(entry.euthanasiaDate),
-      })
-    }
-  }, [entry])
+    })
+  }
 
   const createMut = useMutation({
     mutationFn: (d: LogEntryPost) => logEntriesApi.create(d),

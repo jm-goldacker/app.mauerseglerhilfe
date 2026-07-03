@@ -9,11 +9,7 @@ const keycloak = new Keycloak({
 })
 
 export function hasRole(role: string): boolean {
-  const realmAccess = keycloak.realmAccess as unknown
-  if (Array.isArray(realmAccess)) {
-    return (realmAccess as string[]).includes(role)
-  }
-  return (realmAccess as { roles?: string[] })?.roles?.includes(role) ?? false
+  return keycloak.realmAccess?.roles?.includes(role) ?? false
 }
 
 export default keycloak
