@@ -12,7 +12,13 @@ services:
     networks:
       - mauerseglerhilfe
     depends_on:
-      - api
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
   api:
     image: mgoldacker/api-mauerseglerhilfe:latest
@@ -34,6 +40,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      # Das aspnet-Image hat kein curl/wget - HTTP-Check auf /health via bash
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/8080 && printf 'GET /health HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '200 OK' <&3"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
 
   keycloak:
     image: quay.io/keycloak/keycloak:22.0.5
