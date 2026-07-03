@@ -125,7 +125,7 @@ export default function Fahrtenbuch() {
               <span className="text-sm font-semibold" style={{ color: 'hsl(208, 100%, 20%)' }}>
                 {editTrip ? 'Fahrt bearbeiten' : 'Neue Fahrt erfassen'}
               </span>
-              <button onClick={() => { setShowForm(false); setEditTrip(null) }} title="Schließen" aria-label="Schließen" className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => { setShowForm(false); setEditTrip(null); setError('') }} title="Schließen" aria-label="Schließen" className="text-slate-400 hover:text-slate-600">
                 <XIcon size={15} />
               </button>
             </div>

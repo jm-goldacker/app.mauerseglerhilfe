@@ -108,7 +108,10 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
                           value={editName}
                           onChange={(e) => setEditName(e.target.value)}
                           autoFocus
-                          onKeyDown={(e) => { if (e.key === 'Escape') setEditId(null) }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Escape') setEditId(null)
+                            if (e.key === 'Enter' && editName.trim() && !updateMut.isPending) updateMut.mutate({ id: item.id, name: editName.trim() })
+                          }}
                           className="flex-1 px-4 py-2.5 text-sm border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors"
                           style={{ borderColor: 'hsl(205, 100%, 60%)', '--tw-ring-color': 'hsl(205, 100%, 35%, 0.3)' } as React.CSSProperties}
                         />
