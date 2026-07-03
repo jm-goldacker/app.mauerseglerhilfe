@@ -50,46 +50,54 @@ export function useTableControls() {
   return { sort, toggleSort, filters, setFilter, clearFilters, showFilters, setShowFilters, activeFilters }
 }
 
-/** Wendet aktive Filter und die aktuelle Sortierung auf die Zeilen an. */
+/** Wendet aktive Filter und Sortierung auf die Zeilen an (pure Funktion, testbar). */
+export function filterAndSortRows<T>(
+  rows: T[],
+  columns: Column<T>[],
+  sort: SortState,
+  filters: Record<string, string>,
+): T[] {
+  const byKey = new Map(columns.map((c) => [c.key, c]))
+
+  let result = rows.filter((row) =>
+    Object.entries(filters).every(([key, value]) => {
+      const q = value.trim().toLowerCase()
+      if (!q) return true
+      const col = byKey.get(key)
+      if (!col?.get) return true
+      const cell = col.get(row)
+      return String(cell ?? '').toLowerCase().includes(q)
+    }),
+  )
+
+  if (sort.key) {
+    const col = byKey.get(sort.key)
+    if (col?.get) {
+      const factor = sort.dir === 'asc' ? 1 : -1
+      result = [...result].sort((a, b) => {
+        const av = col.get!(a)
+        const bv = col.get!(b)
+        // Leere Werte immer ans Ende sortieren
+        const aEmpty = av === null || av === undefined || av === ''
+        const bEmpty = bv === null || bv === undefined || bv === ''
+        if (aEmpty && bEmpty) return 0
+        if (aEmpty) return 1
+        if (bEmpty) return -1
+        if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * factor
+        return String(av).localeCompare(String(bv), 'de', { numeric: true }) * factor
+      })
+    }
+  }
+
+  return result
+}
+
+/** Memoisierte Variante von filterAndSortRows für den Einsatz in Komponenten. */
 export function useSortedRows<T>(
   rows: T[],
   columns: Column<T>[],
   sort: SortState,
   filters: Record<string, string>,
 ) {
-  return useMemo(() => {
-    const byKey = new Map(columns.map((c) => [c.key, c]))
-
-    let result = rows.filter((row) =>
-      Object.entries(filters).every(([key, value]) => {
-        const q = value.trim().toLowerCase()
-        if (!q) return true
-        const col = byKey.get(key)
-        if (!col?.get) return true
-        const cell = col.get(row)
-        return String(cell ?? '').toLowerCase().includes(q)
-      }),
-    )
-
-    if (sort.key) {
-      const col = byKey.get(sort.key)
-      if (col?.get) {
-        const factor = sort.dir === 'asc' ? 1 : -1
-        result = [...result].sort((a, b) => {
-          const av = col.get!(a)
-          const bv = col.get!(b)
-          // Leere Werte immer ans Ende sortieren
-          const aEmpty = av === null || av === undefined || av === ''
-          const bEmpty = bv === null || bv === undefined || bv === ''
-          if (aEmpty && bEmpty) return 0
-          if (aEmpty) return 1
-          if (bEmpty) return -1
-          if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * factor
-          return String(av).localeCompare(String(bv), 'de', { numeric: true }) * factor
-        })
-      }
-    }
-
-    return result
-  }, [rows, columns, sort, filters])
+  return useMemo(() => filterAndSortRows(rows, columns, sort, filters), [rows, columns, sort, filters])
 }
