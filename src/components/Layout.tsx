@@ -63,7 +63,7 @@ function SidebarContent({
             daher echter Button mit zugänglichem Namen statt klickbarem div */}
         <button
           type="button"
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={() => showCollapseBtn && setCollapsed(!collapsed)}
           aria-label="Seitenleiste ein-/ausklappen"
           title="Seitenleiste ein-/ausklappen"
           className="flex items-center justify-center w-9 h-9 rounded-xl flex-shrink-0 border-0 cursor-pointer"

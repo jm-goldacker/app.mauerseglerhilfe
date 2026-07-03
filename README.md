@@ -50,8 +50,11 @@ PostgreSQL, Reverse-Proxy und SSL) ist in [INSTALLATION.md](INSTALLATION.md)
 beschrieben. Kurzfassung für Updates:
 
 ```bash
-docker compose -f docker-compose.prod.yml pull
-docker compose -f docker-compose.prod.yml up -d
+docker compose --env-file .env.prod -f docker-compose.prod.yml pull
+docker compose --env-file .env.prod -f docker-compose.prod.yml up -d
 ```
+
+> Wichtig: `--env-file .env.prod` nicht weglassen – Compose lädt nur `.env`
+> automatisch; ohne die Datei starten API/Keycloak mit leeren Zugangsdaten.
 
 Datenbank-Migrationen wendet die API beim Start automatisch an.
