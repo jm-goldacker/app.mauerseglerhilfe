@@ -6,13 +6,7 @@ import type { LogEntry } from '../api/types'
 import { PlusIcon, SearchIcon, EditIcon } from '../components/Icons'
 import { type Column, useTableControls, useSortedRows, TableHead, FilterToggle } from '../components/tableControls'
 import QueryError from '../components/QueryError'
-
-function formatDate(d?: string) {
-  if (!d) return '—'
-  // Datumswerte sind als UTC-Mitternacht gespeichert - in UTC formatieren,
-  // damit der Kalendertag unabhängig von der Client-Zeitzone stimmt.
-  return new Date(d).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' })
-}
+import { formatDate } from '../utils/date'
 
 function getVerbleib(entry: LogEntry) {
   if (entry.dispositionType) return entry.dispositionType

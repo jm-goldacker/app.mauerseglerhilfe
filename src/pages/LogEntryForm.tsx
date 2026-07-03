@@ -8,18 +8,7 @@ import {
 import type { LogEntryPost } from '../api/types'
 import { hasRole } from '../auth/keycloak'
 import { ArrowLeftIcon, TrashIcon } from '../components/Icons'
-
-function toInputDate(d?: string) {
-  if (!d) return ''
-  return d.substring(0, 10)
-}
-
-// Heutiges Datum in lokaler Zeit als YYYY-MM-DD (toISOString wäre UTC und
-// zeigt nach Mitternacht lokaler Zeit noch den Vortag).
-function todayISO() {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
+import { todayISO, toInputDate } from '../utils/date'
 
 const DEFAULT: LogEntryPost = {
   date: todayISO(),

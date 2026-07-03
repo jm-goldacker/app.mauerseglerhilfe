@@ -6,19 +6,7 @@ import { hasRole } from '../auth/keycloak'
 import { PlusIcon, EditIcon, TrashIcon, XIcon, CheckIcon } from '../components/Icons'
 import { type Column, useTableControls, useSortedRows, TableHead, FilterToggle } from '../components/tableControls'
 import QueryError from '../components/QueryError'
-
-function formatDate(d: string) {
-  // Datumswerte sind als UTC-Mitternacht gespeichert - in UTC formatieren,
-  // damit der Kalendertag unabhängig von der Client-Zeitzone stimmt.
-  return new Date(d).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' })
-}
-
-// Heutiges Datum in lokaler Zeit als YYYY-MM-DD (toISOString wäre UTC und
-// zeigt nach Mitternacht lokaler Zeit noch den Vortag).
-function todayISO() {
-  const d = new Date()
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-}
+import { formatDate, todayISO } from '../utils/date'
 
 const COLUMNS: Column<TripLog>[] = [
   { key: 'id', label: '#', get: (t) => t.id },
