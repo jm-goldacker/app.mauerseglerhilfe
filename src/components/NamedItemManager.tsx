@@ -117,9 +117,10 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
                           style={{ borderColor: 'hsl(205, 100%, 60%)', '--tw-ring-color': 'hsl(205, 100%, 35%, 0.3)' } as React.CSSProperties}
                         />
                         <button
-                          onClick={() => updateMut.mutate({ id: item.id, name: editName })}
+                          onClick={() => updateMut.mutate({ id: item.id, name: editName.trim() })}
+                          disabled={!editName.trim() || updateMut.isPending}
                           title="Speichern" aria-label="Speichern"
-                          className="inline-flex items-center justify-center w-7 h-7 rounded-md text-green-600 hover:bg-green-50 transition-colors"
+                          className="inline-flex items-center justify-center w-7 h-7 rounded-md text-green-600 hover:bg-green-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           <CheckIcon size={14} />
                         </button>
