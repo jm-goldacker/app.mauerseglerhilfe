@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { logEntriesApi } from '../api/queries'
@@ -96,9 +96,13 @@ export default function Bestandsbuch() {
   const [filterYear, setFilterYear] = useState('')
   const { sort, toggleSort, filters, setFilter, clearFilters, showFilters, setShowFilters, activeFilters } = useTableControls()
 
-  const years = [...new Set(entries.map((e) => new Date(e.date).getFullYear()))].sort((a, b) => b - a)
+  const years = useMemo(
+    () => [...new Set(entries.map((e) => new Date(e.date).getFullYear()))].sort((a, b) => b - a),
+    [entries],
+  )
 
-  const searched = entries
+  // Memoisiert, damit useSortedRows nicht bei jedem Render neu filtert/sortiert
+  const searched = useMemo(() => entries
     .filter((e) => {
       const q = search.toLowerCase()
       const matchSearch = !q ||
@@ -111,7 +115,7 @@ export default function Bestandsbuch() {
         (e.referrer ?? '').toLowerCase().includes(q)
       return matchSearch && (!filterYear || new Date(e.date).getFullYear() === Number(filterYear))
     })
-    .sort((a, b) => a.id - b.id)
+    .sort((a, b) => a.id - b.id), [entries, search, filterYear])
 
   const filtered = useSortedRows(searched, COLUMNS, sort, filters)
 
