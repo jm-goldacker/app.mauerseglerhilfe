@@ -4,6 +4,7 @@ import type { NamedItem } from '../api/types'
 import { hasRole } from '../auth/keycloak'
 import { PlusIcon, EditIcon, TrashIcon, CheckIcon, XIcon } from './Icons'
 import QueryError from './QueryError'
+import ConfirmDialog from './ConfirmDialog'
 import { PrimaryButton, IconButton } from './ui'
 
 interface Props {
@@ -42,6 +43,7 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
   const [editId, setEditId] = useState<number | null>(null)
   const [editName, setEditName] = useState('')
   const [error, setError] = useState('')
+  const [deleteItem, setDeleteItem] = useState<NamedItem | null>(null)
 
   return (
     <div className="flex flex-col h-full">
@@ -134,7 +136,7 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
                             <IconButton onClick={() => { setEditId(item.id); setEditName(item.name) }} title="Bearbeiten" aria-label="Bearbeiten">
                               <EditIcon size={13} />
                             </IconButton>
-                            <IconButton danger onClick={() => { if (confirm(`„${item.name}" löschen?`)) deleteMut.mutate(item.id) }} title="Löschen" aria-label="Löschen">
+                            <IconButton danger onClick={() => setDeleteItem(item)} title="Löschen" aria-label="Löschen">
                               <TrashIcon size={13} />
                             </IconButton>
                           </div>
@@ -148,6 +150,14 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={deleteItem !== null}
+        title={`„${deleteItem?.name}" löschen?`}
+        message="Dieser Eintrag wird dauerhaft entfernt."
+        onConfirm={() => { if (deleteItem) deleteMut.mutate(deleteItem.id); setDeleteItem(null) }}
+        onCancel={() => setDeleteItem(null)}
+      />
     </div>
   )
 }

@@ -6,6 +6,7 @@ import { hasRole } from '../auth/keycloak'
 import { PlusIcon, EditIcon, TrashIcon, XIcon, CheckIcon } from '../components/Icons'
 import { type Column, useTableControls, useSortedRows, TableHead, FilterToggle } from '../components/tableControls'
 import QueryError from '../components/QueryError'
+import ConfirmDialog from '../components/ConfirmDialog'
 import { PrimaryButton, IconButton } from '../components/ui'
 import { formatDate, todayISO } from '../utils/date'
 
@@ -35,6 +36,7 @@ export default function Fahrtenbuch() {
   const [showForm, setShowForm] = useState(false)
   const [editTrip, setEditTrip] = useState<TripLog | null>(null)
   const [form, setForm] = useState<TripLogPost>(EMPTY)
+  const [deleteTrip, setDeleteTrip] = useState<TripLog | null>(null)
 
   const { sort, toggleSort, filters, setFilter, clearFilters, showFilters, setShowFilters, activeFilters } = useTableControls()
   const sorted = useSortedRows(trips, COLUMNS, sort, filters)
@@ -211,7 +213,7 @@ export default function Fahrtenbuch() {
                             <EditIcon size={13} />
                           </IconButton>
                           {isManager && (
-                            <IconButton danger onClick={() => { if (confirm('Fahrt löschen?')) deleteMut.mutate(trip.id) }} title="Löschen" aria-label="Löschen">
+                            <IconButton danger onClick={() => setDeleteTrip(trip)} title="Löschen" aria-label="Löschen">
                               <TrashIcon size={13} />
                             </IconButton>
                           )}
@@ -248,6 +250,14 @@ export default function Fahrtenbuch() {
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={deleteTrip !== null}
+        title="Fahrt löschen?"
+        message={deleteTrip ? `Fahrt vom ${formatDate(deleteTrip.date)} (${deleteTrip.driver}) wird dauerhaft entfernt.` : undefined}
+        onConfirm={() => { if (deleteTrip) deleteMut.mutate(deleteTrip.id); setDeleteTrip(null) }}
+        onCancel={() => setDeleteTrip(null)}
+      />
     </div>
   )
 }

@@ -9,6 +9,7 @@ import type { LogEntryPost } from '../api/types'
 import { hasRole } from '../auth/keycloak'
 import { ArrowLeftIcon, TrashIcon } from '../components/Icons'
 import { PrimaryButton } from '../components/ui'
+import ConfirmDialog from '../components/ConfirmDialog'
 import { todayISO, toInputDate } from '../utils/date'
 
 const DEFAULT: LogEntryPost = {
@@ -54,6 +55,7 @@ export default function LogEntryForm() {
 
   const [form, setForm] = useState<LogEntryPost>(DEFAULT)
   const [error, setError] = useState('')
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const { data: entry, isLoading: entryLoading, error: entryError, refetch } = useQuery({
     queryKey: ['logEntry', id],
@@ -323,7 +325,7 @@ export default function LogEntryForm() {
             {!isNew && isManager && (
               <button
                 type="button"
-                onClick={() => { if (confirm('Eintrag wirklich löschen?')) deleteMut.mutate() }}
+                onClick={() => setShowDeleteConfirm(true)}
                 className="ml-auto inline-flex items-center gap-2 rounded-lg text-sm font-medium border transition-colors"
                 style={{ padding: '12px 20px', borderColor: '#fecdd3', color: '#e11d48' }}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#fff1f2' }}
@@ -336,6 +338,14 @@ export default function LogEntryForm() {
           </div>
         </form>
       </div>
+
+      <ConfirmDialog
+        open={showDeleteConfirm}
+        title={`Eintrag #${id} löschen?`}
+        message="Der Eintrag wird dauerhaft aus dem Bestandsbuch entfernt."
+        onConfirm={() => { setShowDeleteConfirm(false); deleteMut.mutate() }}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </div>
   )
 }
