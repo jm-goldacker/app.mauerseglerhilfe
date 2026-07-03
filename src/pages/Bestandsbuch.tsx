@@ -8,7 +8,9 @@ import { type Column, useTableControls, useSortedRows, TableHead, FilterToggle }
 
 function formatDate(d?: string) {
   if (!d) return '—'
-  return new Date(d).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  // Datumswerte sind als UTC-Mitternacht gespeichert - in UTC formatieren,
+  // damit der Kalendertag unabhängig von der Client-Zeitzone stimmt.
+  return new Date(d).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' })
 }
 
 function getVerbleib(entry: LogEntry) {

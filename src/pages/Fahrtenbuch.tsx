@@ -7,7 +7,16 @@ import { PlusIcon, EditIcon, TrashIcon, XIcon, CheckIcon } from '../components/I
 import { type Column, useTableControls, useSortedRows, TableHead, FilterToggle } from '../components/tableControls'
 
 function formatDate(d: string) {
-  return new Date(d).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  // Datumswerte sind als UTC-Mitternacht gespeichert - in UTC formatieren,
+  // damit der Kalendertag unabhängig von der Client-Zeitzone stimmt.
+  return new Date(d).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' })
+}
+
+// Heutiges Datum in lokaler Zeit als YYYY-MM-DD (toISOString wäre UTC und
+// zeigt nach Mitternacht lokaler Zeit noch den Vortag).
+function todayISO() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
 const COLUMNS: Column<TripLog>[] = [
@@ -22,7 +31,7 @@ const COLUMNS: Column<TripLog>[] = [
 ]
 
 const EMPTY: TripLogPost = {
-  date: new Date().toISOString().substring(0, 10),
+  date: todayISO(),
   driver: '', purpose: '', startLocation: '', endLocation: '', distanceKm: 0,
 }
 

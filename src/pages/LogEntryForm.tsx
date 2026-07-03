@@ -14,8 +14,15 @@ function toInputDate(d?: string) {
   return d.substring(0, 10)
 }
 
+// Heutiges Datum in lokaler Zeit als YYYY-MM-DD (toISOString wäre UTC und
+// zeigt nach Mitternacht lokaler Zeit noch den Vortag).
+function todayISO() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
 const DEFAULT: LogEntryPost = {
-  date: new Date().toISOString().substring(0, 10),
+  date: todayISO(),
   age: '',
   birdSpecies: '',
   circumstance: '',
