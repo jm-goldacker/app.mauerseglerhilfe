@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { statisticsApi } from '../api/queries'
 import QueryError from '../components/QueryError'
@@ -23,19 +23,34 @@ export default function Statistik() {
     queryKey: ['statSpecies', year],
     queryFn: () => statisticsApi.getSpeciesByAge(year),
   })
-  const { data: summary } = useQuery({
+  const { data: summary, isError: summaryError } = useQuery({
     queryKey: ['statSummary', year],
     queryFn: () => statisticsApi.getSummary(year),
   })
 
-  const allAges = [...new Set(rows.flatMap((r) => r.ageStats.map((a) => a.age)))]
-  const sortedAges = [...allAges].sort((a, b) => {
-    const ia = AGE_ORDER.indexOf(a), ib = AGE_ORDER.indexOf(b)
-    if (ia === -1 && ib === -1) return a.localeCompare(b)
-    if (ia === -1) return 1
-    if (ib === -1) return -1
-    return ia - ib
-  })
+  const sortedAges = useMemo(() => {
+    const allAges = [...new Set(rows.flatMap((r) => r.ageStats.map((a) => a.age)))]
+    return allAges.sort((a, b) => {
+      const ia = AGE_ORDER.indexOf(a), ib = AGE_ORDER.indexOf(b)
+      if (ia === -1 && ib === -1) return a.localeCompare(b)
+      if (ia === -1) return 1
+      if (ib === -1) return -1
+      return ia - ib
+    })
+  }, [rows])
+
+  // Summenzeile einmal je Datenstand berechnen statt bei jedem Render
+  const totals = useMemo(() => ({
+    died: rows.reduce((s, r) => s + r.totalDied, 0),
+    survived: rows.reduce((s, r) => s + r.totalSurvived, 0),
+    inCare: rows.reduce((s, r) => s + r.totalInCare, 0),
+    total: rows.reduce((s, r) => s + r.total, 0),
+    byAge: Object.fromEntries(sortedAges.map((age) => [age, {
+      died: rows.reduce((s, r) => s + (r.ageStats.find((a) => a.age === age)?.died ?? 0), 0),
+      survived: rows.reduce((s, r) => s + (r.ageStats.find((a) => a.age === age)?.survived ?? 0), 0),
+      inCare: rows.reduce((s, r) => s + (r.ageStats.find((a) => a.age === age)?.inCare ?? 0), 0),
+    }])),
+  }), [rows, sortedAges])
 
   return (
     <div className="flex flex-col h-full">
@@ -61,8 +76,14 @@ export default function Statistik() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
             <StatCard label="Aufnahmen gesamt" value={summary.total} color="hsl(31, 100%, 47%)" />
             <StatCard label="In Pflege" value={summary.inCare} color="hsl(205, 100%, 35%)" sub="aktuell" />
-            <StatCard label="Ausgewildert" value={summary.released} color="#16a34a" sub="erfolgreich" />
+            <StatCard label="Ausgewildert / vermittelt" value={summary.released} color="#16a34a" sub="erfolgreich abgeschlossen" />
             <StatCard label="Verstorben" value={summary.died} color="#dc2626" sub="inkl. Euthanasie" />
+          </div>
+        )}
+
+        {summaryError && (
+          <div className="px-4 py-3 rounded-lg text-sm border" style={{ background: '#fff1f2', color: '#be123c', borderColor: '#fecdd3' }}>
+            Zusammenfassung konnte nicht geladen werden
           </div>
         )}
 
@@ -148,35 +169,24 @@ export default function Statistik() {
                   )
                 })}
               </tbody>
-              {rows.length > 0 && (() => {
-                const td = rows.reduce((s, r) => s + r.totalDied, 0)
-                const ts = rows.reduce((s, r) => s + r.totalSurvived, 0)
-                const tc = rows.reduce((s, r) => s + r.totalInCare, 0)
-                const tt = rows.reduce((s, r) => s + r.total, 0)
-                return (
-                  <tfoot>
-                    <tr style={{ background: 'hsl(218, 55%, 95%)', borderTop: '2px solid hsl(218, 30%, 85%)' }}>
-                      <td className="px-5 py-4 font-bold sticky left-0" style={{ color: 'hsl(208, 100%, 20%)', background: 'hsl(218, 55%, 95%)' }}>Gesamt</td>
-                      {sortedAges.map((age) => {
-                        const d = rows.reduce((s, r) => s + (r.ageStats.find((a) => a.age === age)?.died ?? 0), 0)
-                        const v = rows.reduce((s, r) => s + (r.ageStats.find((a) => a.age === age)?.survived ?? 0), 0)
-                        const c = rows.reduce((s, r) => s + (r.ageStats.find((a) => a.age === age)?.inCare ?? 0), 0)
-                        return (
-                          <React.Fragment key={age}>
-                            <td className="px-3 py-4 text-center font-semibold border-l border-slate-200" style={{ color: '#dc2626' }}>{d}</td>
-                            <td className="px-3 py-4 text-center font-semibold" style={{ color: '#16a34a' }}>{v}</td>
-                            <td className="px-3 py-4 text-center font-semibold" style={{ color: 'hsl(205, 100%, 35%)' }}>{c}</td>
-                          </React.Fragment>
-                        )
-                      })}
-                      <td className="px-3 py-4 text-center font-bold border-l-2 border-slate-300" style={{ color: '#dc2626' }}>{td}</td>
-                      <td className="px-3 py-4 text-center font-bold" style={{ color: '#16a34a' }}>{ts}</td>
-                      <td className="px-3 py-4 text-center font-bold" style={{ color: 'hsl(205, 100%, 35%)' }}>{tc}</td>
-                      <td className="px-3 py-4 text-center font-bold text-lg" style={{ color: 'hsl(31, 100%, 47%)' }}>{tt}</td>
-                    </tr>
-                  </tfoot>
-                )
-              })()}
+              {rows.length > 0 && (
+                <tfoot>
+                  <tr style={{ background: 'hsl(218, 55%, 95%)', borderTop: '2px solid hsl(218, 30%, 85%)' }}>
+                    <td className="px-5 py-4 font-bold sticky left-0" style={{ color: 'hsl(208, 100%, 20%)', background: 'hsl(218, 55%, 95%)' }}>Gesamt</td>
+                    {sortedAges.map((age) => (
+                      <React.Fragment key={age}>
+                        <td className="px-3 py-4 text-center font-semibold border-l border-slate-200" style={{ color: '#dc2626' }}>{totals.byAge[age].died}</td>
+                        <td className="px-3 py-4 text-center font-semibold" style={{ color: '#16a34a' }}>{totals.byAge[age].survived}</td>
+                        <td className="px-3 py-4 text-center font-semibold" style={{ color: 'hsl(205, 100%, 35%)' }}>{totals.byAge[age].inCare}</td>
+                      </React.Fragment>
+                    ))}
+                    <td className="px-3 py-4 text-center font-bold border-l-2 border-slate-300" style={{ color: '#dc2626' }}>{totals.died}</td>
+                    <td className="px-3 py-4 text-center font-bold" style={{ color: '#16a34a' }}>{totals.survived}</td>
+                    <td className="px-3 py-4 text-center font-bold" style={{ color: 'hsl(205, 100%, 35%)' }}>{totals.inCare}</td>
+                    <td className="px-3 py-4 text-center font-bold text-lg" style={{ color: 'hsl(31, 100%, 47%)' }}>{totals.total}</td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
             {rows.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 text-slate-400">
