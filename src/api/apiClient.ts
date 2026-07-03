@@ -63,11 +63,15 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   }
 
   if (res.status === 401) {
-    if (isMutation) {
-      throw new Error('Sitzung abgelaufen. Eingaben ggf. kopieren und die Seite neu laden, um sich erneut anzumelden.')
-    }
-    await keycloak.login()
-    throw new Error('Sitzung abgelaufen – bitte erneut anmelden')
+    // updateToken war unmittelbar zuvor erfolgreich - der Server lehnt also ein
+    // frisches Token ab (z. B. Audience-/Rollen-Konfiguration). Ein Login-Redirect
+    // würde hier in einer Endlosschleife enden, weil die SSO-Session den Nutzer
+    // still wieder anmeldet und der nächste Request erneut 401 liefert.
+    throw new Error(
+      isMutation
+        ? 'Anmeldung vom Server abgelehnt. Eingaben ggf. kopieren und die Seite neu laden.'
+        : 'Anmeldung vom Server abgelehnt – bitte Seite neu laden oder Administrator kontaktieren.',
+    )
   }
   if (!res.ok) {
     throw new Error(await errorMessage(res))
