@@ -6,6 +6,7 @@ import type { LogEntry } from '../api/types'
 import { PlusIcon, SearchIcon, EditIcon } from '../components/Icons'
 import { type Column, useTableControls, useSortedRows, TableHead, FilterToggle } from '../components/tableControls'
 import QueryError from '../components/QueryError'
+import { PrimaryButton, IconButton } from '../components/ui'
 import { formatDate } from '../utils/date'
 
 function getVerbleib(entry: LogEntry) {
@@ -122,16 +123,10 @@ export default function Bestandsbuch() {
           <h1 className="text-lg sm:text-xl font-semibold text-slate-900">Bestandsbuch</h1>
           <p className="text-sm text-slate-500 mt-0.5">{entries.length} Einträge gesamt</p>
         </div>
-        <button
-          onClick={() => navigate('/eintrag/neu')}
-          className="inline-flex items-center gap-2 rounded-lg text-sm font-medium text-white transition-colors whitespace-nowrap"
-          style={{ background: 'hsl(205, 100%, 35%)', padding: '12px 20px' }}
-          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'hsl(208, 100%, 20%)')}
-          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'hsl(205, 100%, 35%)')}
-        >
+        <PrimaryButton onClick={() => navigate('/eintrag/neu')} className="whitespace-nowrap">
           <PlusIcon size={15} />
           Neuer Eintrag
-        </button>
+        </PrimaryButton>
       </div>
 
       {/* Filter bar */}
@@ -201,16 +196,9 @@ export default function Bestandsbuch() {
                         <td className="px-5 py-4 whitespace-nowrap text-slate-500">{formatDate(verbleibDate)}</td>
                         <td className="px-4 py-4 whitespace-nowrap">{verbleib ? <VerbleibBadge value={verbleib} /> : <span className="text-slate-300 text-xs whitespace-nowrap">in Pflege</span>}</td>
                         <td className="px-4 py-4 w-12" onClick={(e) => e.stopPropagation()}>
-                          <button
-                            onClick={() => navigate(`/eintrag/${entry.id}`)}
-                            title="Eintrag bearbeiten" aria-label="Eintrag bearbeiten"
-                            className="inline-flex items-center justify-center w-7 h-7 rounded-md transition-colors"
-                            style={{ color: '#94a3b8' }}
-                            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(205, 100%, 35%)'; (e.currentTarget as HTMLElement).style.background = 'hsl(218, 55%, 91%)' }}
-                            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#94a3b8'; (e.currentTarget as HTMLElement).style.background = 'transparent' }}
-                          >
+                          <IconButton onClick={() => navigate(`/eintrag/${entry.id}`)} title="Eintrag bearbeiten" aria-label="Eintrag bearbeiten">
                             <EditIcon size={13} />
-                          </button>
+                          </IconButton>
                         </td>
                       </tr>
                     )

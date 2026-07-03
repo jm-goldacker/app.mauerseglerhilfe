@@ -8,6 +8,7 @@ import {
 import type { LogEntryPost } from '../api/types'
 import { hasRole } from '../auth/keycloak'
 import { ArrowLeftIcon, TrashIcon } from '../components/Icons'
+import { PrimaryButton } from '../components/ui'
 import { todayISO, toInputDate } from '../utils/date'
 
 const DEFAULT: LogEntryPost = {
@@ -152,13 +153,9 @@ export default function LogEntryForm() {
           Eintrag #{id} konnte nicht geladen werden{entryError ? `: ${entryError.message}` : ''}
         </div>
         <div className="flex gap-3">
-          <button
-            onClick={() => refetch()}
-            className="rounded-lg text-sm font-medium text-white transition-colors"
-            style={{ padding: '10px 20px', background: 'hsl(205, 100%, 35%)' }}
-          >
+          <PrimaryButton onClick={() => refetch()} style={{ padding: '10px 20px' }}>
             Erneut versuchen
-          </button>
+          </PrimaryButton>
           <button
             onClick={() => navigate('/')}
             className="rounded-lg text-sm font-medium border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors"
@@ -309,19 +306,12 @@ export default function LogEntryForm() {
 
           {/* Actions */}
           <div className="flex flex-wrap items-center gap-3 pt-4 pb-10">
-            <button
-              type="submit"
-              disabled={isPending}
-              className="inline-flex items-center gap-2 rounded-lg text-sm font-medium text-white disabled:opacity-60 transition-colors"
-              style={{ padding: '12px 24px', background: 'hsl(205, 100%, 35%)' }}
-              onMouseEnter={(e) => { if (!isPending) (e.currentTarget as HTMLElement).style.background = 'hsl(208, 100%, 20%)' }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'hsl(205, 100%, 35%)' }}
-            >
+            <PrimaryButton type="submit" disabled={isPending} style={{ padding: '12px 24px' }}>
               {isPending && (
                 <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               )}
               {isNew ? 'Eintrag erstellen' : 'Änderungen speichern'}
-            </button>
+            </PrimaryButton>
             <button
               type="button"
               onClick={() => navigate(-1)}

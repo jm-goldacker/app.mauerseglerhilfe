@@ -4,6 +4,7 @@ import type { NamedItem } from '../api/types'
 import { hasRole } from '../auth/keycloak'
 import { PlusIcon, EditIcon, TrashIcon, CheckIcon, XIcon } from './Icons'
 import QueryError from './QueryError'
+import { PrimaryButton, IconButton } from './ui'
 
 interface Props {
   title: string
@@ -74,17 +75,10 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
                 className="flex-1 px-4 py-3 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors placeholder:text-slate-300"
                 style={{ '--tw-ring-color': 'hsl(205, 100%, 35%, 0.3)' } as React.CSSProperties}
               />
-              <button
-                type="submit"
-                disabled={!newName.trim() || createMut.isPending}
-                className="inline-flex items-center gap-2 rounded-lg text-sm font-medium text-white disabled:opacity-50 transition-colors flex-shrink-0"
-                style={{ padding: '12px 20px', background: 'hsl(205, 100%, 35%)' }}
-                onMouseEnter={(e) => { if (newName.trim()) (e.currentTarget as HTMLElement).style.background = 'hsl(208, 100%, 20%)' }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'hsl(205, 100%, 35%)' }}
-              >
+              <PrimaryButton type="submit" disabled={!newName.trim() || createMut.isPending} className="flex-shrink-0">
                 <PlusIcon size={14} />
                 Hinzufügen
-              </button>
+              </PrimaryButton>
             </form>
           )}
 
@@ -137,26 +131,12 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
                         <span className="flex-1 text-sm text-slate-800">{item.name}</span>
                         {isManager && (
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button
-                              onClick={() => { setEditId(item.id); setEditName(item.name) }}
-                              title="Bearbeiten" aria-label="Bearbeiten"
-                              className="inline-flex items-center justify-center w-7 h-7 rounded-md transition-colors"
-                              style={{ color: '#94a3b8' }}
-                              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(205, 100%, 35%)'; (e.currentTarget as HTMLElement).style.background = 'hsl(218, 55%, 91%)' }}
-                              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#94a3b8'; (e.currentTarget as HTMLElement).style.background = 'transparent' }}
-                            >
+                            <IconButton onClick={() => { setEditId(item.id); setEditName(item.name) }} title="Bearbeiten" aria-label="Bearbeiten">
                               <EditIcon size={13} />
-                            </button>
-                            <button
-                              onClick={() => { if (confirm(`„${item.name}" löschen?`)) deleteMut.mutate(item.id) }}
-                              title="Löschen" aria-label="Löschen"
-                              className="inline-flex items-center justify-center w-7 h-7 rounded-md transition-colors"
-                              style={{ color: '#94a3b8' }}
-                              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#e11d48'; (e.currentTarget as HTMLElement).style.background = '#fff1f2' }}
-                              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#94a3b8'; (e.currentTarget as HTMLElement).style.background = 'transparent' }}
-                            >
+                            </IconButton>
+                            <IconButton danger onClick={() => { if (confirm(`„${item.name}" löschen?`)) deleteMut.mutate(item.id) }} title="Löschen" aria-label="Löschen">
                               <TrashIcon size={13} />
-                            </button>
+                            </IconButton>
                           </div>
                         )}
                       </>

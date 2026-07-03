@@ -6,6 +6,7 @@ import { hasRole } from '../auth/keycloak'
 import { PlusIcon, EditIcon, TrashIcon, XIcon, CheckIcon } from '../components/Icons'
 import { type Column, useTableControls, useSortedRows, TableHead, FilterToggle } from '../components/tableControls'
 import QueryError from '../components/QueryError'
+import { PrimaryButton, IconButton } from '../components/ui'
 import { formatDate, todayISO } from '../utils/date'
 
 const COLUMNS: Column<TripLog>[] = [
@@ -83,16 +84,10 @@ export default function Fahrtenbuch() {
           <h1 className="text-lg sm:text-xl font-semibold text-slate-900">Fahrtenbuch</h1>
           <p className="text-sm text-slate-500 mt-0.5">{trips.length} Fahrten · {totalKm.toFixed(1)} km gesamt</p>
         </div>
-        <button
-          onClick={() => { setShowForm(true); setEditTrip(null); setForm(EMPTY) }}
-          className="inline-flex items-center gap-2 rounded-lg text-sm font-medium text-white transition-colors whitespace-nowrap"
-          style={{ padding: '12px 20px', background: 'hsl(205, 100%, 35%)' }}
-          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'hsl(208, 100%, 20%)')}
-          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'hsl(205, 100%, 35%)')}
-        >
+        <PrimaryButton onClick={() => { setShowForm(true); setEditTrip(null); setForm(EMPTY) }} className="whitespace-nowrap">
           <PlusIcon size={15} />
           Neue Fahrt
-        </button>
+        </PrimaryButton>
       </div>
 
       <div className="flex-1 overflow-auto" style={{ padding: '36px 48px', display: 'flex', flexDirection: 'column', gap: 32 }}>
@@ -162,15 +157,10 @@ export default function Fahrtenbuch() {
                 <input value={form.notes ?? ''} onChange={(e) => set('notes', e.target.value)} placeholder="Optional…" className={inputCls} />
               </div>
               <div className="flex items-end">
-                <button type="submit"
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium text-white transition-colors"
-                  style={{ padding: '12px 20px', background: 'hsl(205, 100%, 35%)' }}
-                  onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = 'hsl(208, 100%, 20%)')}
-                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = 'hsl(205, 100%, 35%)')}
-                >
+                <PrimaryButton type="submit" className="w-full">
                   <CheckIcon size={14} />
                   {editTrip ? 'Speichern' : 'Erfassen'}
-                </button>
+                </PrimaryButton>
               </div>
             </form>
           </div>
@@ -217,21 +207,13 @@ export default function Fahrtenbuch() {
                       <td className="px-4 py-4 text-slate-400 text-xs">{trip.notes ?? ''}</td>
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-1">
-                          <button onClick={() => startEdit(trip)}
-                            title="Bearbeiten" aria-label="Bearbeiten"
-                            className="inline-flex items-center justify-center w-7 h-7 rounded-md transition-colors"
-                            style={{ color: '#94a3b8' }}
-                            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(205, 100%, 35%)'; (e.currentTarget as HTMLElement).style.background = 'hsl(218, 55%, 91%)' }}
-                            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#94a3b8'; (e.currentTarget as HTMLElement).style.background = 'transparent' }}
-                          ><EditIcon size={13} /></button>
+                          <IconButton onClick={() => startEdit(trip)} title="Bearbeiten" aria-label="Bearbeiten">
+                            <EditIcon size={13} />
+                          </IconButton>
                           {isManager && (
-                            <button onClick={() => { if (confirm('Fahrt löschen?')) deleteMut.mutate(trip.id) }}
-                              title="Löschen" aria-label="Löschen"
-                              className="inline-flex items-center justify-center w-7 h-7 rounded-md transition-colors"
-                              style={{ color: '#94a3b8' }}
-                              onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#e11d48'; (e.currentTarget as HTMLElement).style.background = '#fff1f2' }}
-                              onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#94a3b8'; (e.currentTarget as HTMLElement).style.background = 'transparent' }}
-                            ><TrashIcon size={13} /></button>
+                            <IconButton danger onClick={() => { if (confirm('Fahrt löschen?')) deleteMut.mutate(trip.id) }} title="Löschen" aria-label="Löschen">
+                              <TrashIcon size={13} />
+                            </IconButton>
                           )}
                         </div>
                       </td>
