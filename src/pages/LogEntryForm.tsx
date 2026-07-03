@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
@@ -71,8 +71,12 @@ export default function LogEntryForm() {
   const { data: careStations = [] } = useQuery({ queryKey: ['careStations'], queryFn: careStationsApi.getAll })
   const { data: referrers = [] } = useQuery({ queryKey: ['referrers'], queryFn: referrersApi.getAll })
 
+  // Formular nur einmal aus dem geladenen Eintrag befüllen: Background-Refetches
+  // (z. B. bei Fenster-Fokus) dürfen ungespeicherte Eingaben nicht überschreiben.
+  const seededRef = useRef(false)
   useEffect(() => {
-    if (entry) {
+    if (entry && !seededRef.current) {
+      seededRef.current = true
       setForm({
         date: toInputDate(entry.date),
         name: entry.name,
