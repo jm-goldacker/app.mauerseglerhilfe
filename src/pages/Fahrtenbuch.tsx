@@ -139,7 +139,7 @@ export default function Fahrtenbuch() {
               <span className="text-sm font-semibold" style={{ color: 'hsl(208, 100%, 20%)' }}>
                 {editTrip ? 'Fahrt bearbeiten' : 'Neue Fahrt erfassen'}
               </span>
-              <button onClick={() => { setShowForm(false); setEditTrip(null) }} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => { setShowForm(false); setEditTrip(null) }} title="Schließen" aria-label="Schließen" className="text-slate-400 hover:text-slate-600">
                 <XIcon size={15} />
               </button>
             </div>
@@ -230,6 +230,7 @@ export default function Fahrtenbuch() {
                       <td className="px-4 py-4">
                         <div className="flex items-center gap-1">
                           <button onClick={() => startEdit(trip)}
+                            title="Bearbeiten" aria-label="Bearbeiten"
                             className="inline-flex items-center justify-center w-7 h-7 rounded-md transition-colors"
                             style={{ color: '#94a3b8' }}
                             onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(205, 100%, 35%)'; (e.currentTarget as HTMLElement).style.background = 'hsl(218, 55%, 91%)' }}
@@ -237,6 +238,7 @@ export default function Fahrtenbuch() {
                           ><EditIcon size={13} /></button>
                           {isManager && (
                             <button onClick={() => { if (confirm('Fahrt löschen?')) deleteMut.mutate(trip.id) }}
+                              title="Löschen" aria-label="Löschen"
                               className="inline-flex items-center justify-center w-7 h-7 rounded-md transition-colors"
                               style={{ color: '#94a3b8' }}
                               onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#e11d48'; (e.currentTarget as HTMLElement).style.background = '#fff1f2' }}

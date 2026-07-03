@@ -118,12 +118,14 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
                         />
                         <button
                           onClick={() => updateMut.mutate({ id: item.id, name: editName })}
+                          title="Speichern" aria-label="Speichern"
                           className="inline-flex items-center justify-center w-7 h-7 rounded-md text-green-600 hover:bg-green-50 transition-colors"
                         >
                           <CheckIcon size={14} />
                         </button>
                         <button
                           onClick={() => setEditId(null)}
+                          title="Abbrechen" aria-label="Abbrechen"
                           className="inline-flex items-center justify-center w-7 h-7 rounded-md text-slate-400 hover:bg-slate-100 transition-colors"
                         >
                           <XIcon size={14} />
@@ -136,6 +138,7 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
                           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
                               onClick={() => { setEditId(item.id); setEditName(item.name) }}
+                              title="Bearbeiten" aria-label="Bearbeiten"
                               className="inline-flex items-center justify-center w-7 h-7 rounded-md transition-colors"
                               style={{ color: '#94a3b8' }}
                               onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(205, 100%, 35%)'; (e.currentTarget as HTMLElement).style.background = 'hsl(218, 55%, 91%)' }}
@@ -145,6 +148,7 @@ export default function NamedItemManager({ title, description, queryKey, fetchAl
                             </button>
                             <button
                               onClick={() => { if (confirm(`„${item.name}" löschen?`)) deleteMut.mutate(item.id) }}
+                              title="Löschen" aria-label="Löschen"
                               className="inline-flex items-center justify-center w-7 h-7 rounded-md transition-colors"
                               style={{ color: '#94a3b8' }}
                               onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = '#e11d48'; (e.currentTarget as HTMLElement).style.background = '#fff1f2' }}

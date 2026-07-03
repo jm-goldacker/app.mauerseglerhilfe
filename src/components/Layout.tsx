@@ -73,6 +73,7 @@ function SidebarContent({
         {showCollapseBtn && !collapsed &&(
           <button
             onClick={() => setCollapsed(!collapsed)}
+            title="Seitenleiste einklappen" aria-label="Seitenleiste einklappen"
             className="flex items-center justify-center w-7 h-7 rounded-lg transition-colors flex-shrink-0 ml-auto"
             style={{ color: INACTIVE_TEXT }}
             onMouseEnter={(e) => (e.currentTarget.style.color = '#fff')}
@@ -86,6 +87,7 @@ function SidebarContent({
         {showCloseBtn && (
           <button
             onClick={close}
+            title="Menü schließen" aria-label="Menü schließen"
             className="flex items-center justify-center w-7 h-7 rounded-lg transition-colors flex-shrink-0 ml-auto"
             style={{ color: INACTIVE_TEXT }}
             onMouseEnter={(e) => (e.currentTarget.style.color = '#fff')}
@@ -247,6 +249,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <header className="gap-5 flex items-center h-14 px-4 bg-white border-b border-slate-200 lg:hidden flex-shrink-0 shadow-sm">
           <button
             onClick={() => setMobileOpen(true)}
+            title="Menü öffnen" aria-label="Menü öffnen"
             className="p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors"
           >
             <MenuIcon size={22} />

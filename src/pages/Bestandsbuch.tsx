@@ -209,6 +209,7 @@ export default function Bestandsbuch() {
                         <td className="px-4 py-4 w-12" onClick={(e) => e.stopPropagation()}>
                           <button
                             onClick={() => navigate(`/eintrag/${entry.id}`)}
+                            title="Eintrag bearbeiten" aria-label="Eintrag bearbeiten"
                             className="inline-flex items-center justify-center w-7 h-7 rounded-md transition-colors"
                             style={{ color: '#94a3b8' }}
                             onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'hsl(205, 100%, 35%)'; (e.currentTarget as HTMLElement).style.background = 'hsl(218, 55%, 91%)' }}
