@@ -56,6 +56,7 @@ export default function LogEntryForm() {
   const [form, setForm] = useState<LogEntryPost>(DEFAULT)
   const [error, setError] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [seeded, setSeeded] = useState(false)
 
   const { data: entry, isLoading: entryLoading, error: entryError, refetch } = useQuery({
     queryKey: ['logEntry', id],
@@ -70,11 +71,22 @@ export default function LogEntryForm() {
   const { data: careStations = [] } = useQuery({ queryKey: ['careStations'], queryFn: careStationsApi.getAll })
   const { data: referrers = [] } = useQuery({ queryKey: ['referrers'], queryFn: referrersApi.getAll })
 
+  // Bei Routenwechsel (anderer Eintrag oder „neu") Formular zurücksetzen -
+  // React verwendet dieselbe Komponenteninstanz weiter, sonst blieben die
+  // Werte des vorherigen Eintrags stehen.
+  const [prevId, setPrevId] = useState(id)
+  if (id !== prevId) {
+    setPrevId(id)
+    setSeeded(false)
+    setForm(DEFAULT)
+    setError('')
+    setShowDeleteConfirm(false)
+  }
+
   // Formular nur einmal aus dem geladenen Eintrag befüllen: Background-Refetches
   // (z. B. bei Fenster-Fokus) dürfen ungespeicherte Eingaben nicht überschreiben.
   // Render-Phase-Update statt Effect (vgl. react.dev "You Might Not Need an Effect").
-  const [seeded, setSeeded] = useState(false)
-  if (entry && !seeded) {
+  if (entry && !isNew && !seeded) {
     setSeeded(true)
     setForm({
         date: toInputDate(entry.date),
