@@ -59,11 +59,18 @@ function SidebarContent({
     <>
       {/* Logo */}
       <div className="flex items-center flex-shrink-0" style={{ height: 64, padding: '0 20px', borderBottom: `1px solid ${SIDEBAR_BORDER}` }}>
-        <div className="flex items-center justify-center w-9 h-9 rounded-xl flex-shrink-0"
+        {/* Bei eingeklappter Sidebar ist das Logo der einzige Weg zum Ausklappen -
+            daher echter Button mit zugänglichem Namen statt klickbarem div */}
+        <button
+          type="button"
+          onClick={() => setCollapsed(!collapsed)}
+          aria-label="Seitenleiste ein-/ausklappen"
+          title="Seitenleiste ein-/ausklappen"
+          className="flex items-center justify-center w-9 h-9 rounded-xl flex-shrink-0 border-0 cursor-pointer"
           style={{ background: 'hsl(205, 100%, 35%)', margin: !collapsed ? '0 10px 0 0' : '0' }}
-          onClick={() => setCollapsed(!collapsed)}>
-          <BirdIcon size={20} className="text-white"  />
-        </div>
+        >
+          <BirdIcon size={20} className="text-white" />
+        </button>
         {!collapsed && (
           <div className="ml-3 overflow-hidden flex-1 min-w-0">
             <div className="text-white font-semibold text-sm whitespace-nowrap">Mauerseglerhilfe</div>

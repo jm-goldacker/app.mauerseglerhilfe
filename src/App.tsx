@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Layout from './components/Layout'
 import Bestandsbuch from './pages/Bestandsbuch'
@@ -37,6 +37,8 @@ export default function App() {
             <Route path="/stammdaten/verbleib" element={<Verbleib />} />
             <Route path="/stammdaten/pflegestellen" element={<Pflegestellen />} />
             <Route path="/stammdaten/vermittler" element={<Vermittler />} />
+            {/* Unbekannte URLs zeigten bisher nur leeren Inhalt */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Layout>
       </BrowserRouter>

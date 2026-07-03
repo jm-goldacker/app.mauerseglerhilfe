@@ -126,15 +126,31 @@ export default function LogEntryForm() {
     onError: (e: Error) => setError(`Löschen fehlgeschlagen: ${e.message}`),
   })
 
+  // Leere Werte als '' behalten, damit die Inputs kontrolliert bleiben;
+  // die Bereinigung zu undefined passiert erst beim Absenden.
   function set(field: keyof LogEntryPost, value: string | undefined) {
-    setForm((f) => ({ ...f, [field]: value || undefined }))
+    setForm((f) => ({ ...f, [field]: value ?? '' }))
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     const iso = (d?: string) => d ? new Date(d).toISOString() : undefined
+    // Leere Strings zu undefined bereinigen - das Backend behandelt nur
+    // fehlende Werte als "nicht gesetzt" (leere Namen würden z. B. als
+    // unbekannte Stammdaten-Referenz abgelehnt).
+    const clean = (s?: string) => (s && s.trim() !== '' ? s : undefined)
     const payload: LogEntryPost = {
       ...form,
+      name: clean(form.name),
+      ringNumber: clean(form.ringNumber),
+      finderName: clean(form.finderName),
+      serviceType: clean(form.serviceType),
+      dispositionType: clean(form.dispositionType),
+      careStation: clean(form.careStation),
+      referrer: clean(form.referrer),
+      takenInBy: clean(form.takenInBy),
+      zipFoundAt: clean(form.zipFoundAt),
+      redirectedTo: clean(form.redirectedTo),
       date: new Date(form.date).toISOString(),
       takenInDate: iso(form.takenInDate),
       letFreeDate: iso(form.letFreeDate),
