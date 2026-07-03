@@ -9,7 +9,15 @@ const keycloak = new Keycloak({
 })
 
 export function hasRole(role: string): boolean {
-  return keycloak.realmAccess?.roles?.includes(role) ?? false
+  // realm_access kann je nach Keycloak-Konfiguration als { roles: [...] }
+  // ODER als flaches Array ankommen - beide Formen unterstützen (das Backend
+  // tut dasselbe im KeycloakClaimsTransformer). Der Array-Zweig wurde einmal
+  // als "tot" entfernt und hat Managern real die Rechte genommen.
+  const realmAccess = keycloak.realmAccess as unknown
+  if (Array.isArray(realmAccess)) {
+    return (realmAccess as string[]).includes(role)
+  }
+  return (realmAccess as { roles?: string[] } | undefined)?.roles?.includes(role) ?? false
 }
 
 export default keycloak
