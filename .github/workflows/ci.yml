@@ -5,6 +5,10 @@ on:
     branches: [master]
   pull_request:
 
+# Minimalrechte fuer GITHUB_TOKEN - CI braucht nur Lesezugriff
+permissions:
+  contents: read
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest

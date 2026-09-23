@@ -49,7 +49,7 @@ services:
       start_period: 60s
 
   keycloak:
-    image: quay.io/keycloak/keycloak:22.0.5
+    image: quay.io/keycloak/keycloak:26.7.4
     restart: unless-stopped
     command: start
     ports:
@@ -59,13 +59,18 @@ services:
       KC_DB_URL: jdbc:postgresql://postgres-keycloak:5432/keycloak
       KC_DB_USERNAME: keycloak
       KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
-      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
-      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      # Initialer Admin (nur beim allerersten Start relevant)
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
       KC_HTTP_RELATIVE_PATH: /auth
-      KC_HOSTNAME: auth.mauersegler.goldacker-it-solutions.de
-      KC_HOSTNAME_STRICT: "false"
+      # Hostname v2: vollstaendige oeffentliche URL inkl. Pfad. Backchannel
+      # dynamisch, damit die API Metadaten/Schluessel intern ueber
+      # http://keycloak:8080 laden kann
+      KC_HOSTNAME: https://auth.mauersegler.goldacker-it-solutions.de/auth
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
       KC_HTTP_ENABLED: "true"
-      KC_PROXY: edge
+      # TLS terminiert am nginx-Proxy (ersetzt das entfernte KC_PROXY=edge)
+      KC_PROXY_HEADERS: xforwarded
     networks:
       - mauerseglerhilfe
     depends_on:

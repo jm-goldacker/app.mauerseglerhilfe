@@ -16,6 +16,10 @@ function createWindow() {
     backgroundColor: '#f9fafb',
   })
 
+  // Keine Popups/neuen Fenster: die App braucht keine, und so kann kein
+  // eingeschleuster Link ein ungeschuetztes Fenster oeffnen
+  win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+
   if (isDev) {
     win.loadURL('http://localhost:5173')
     win.webContents.openDevTools()
@@ -25,12 +29,11 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  // Allow insecure Keycloak in dev
-  if (isDev) {
-    session.defaultSession.setPermissionRequestHandler((_webContents, permission, callback) => {
-      callback(true)
-    })
-  }
+  // Die App braucht keine Geraete-/Browser-Berechtigungen (Kamera, Mikrofon,
+  // Standort, Benachrichtigungen, ...) - alle Anfragen ablehnen
+  session.defaultSession.setPermissionRequestHandler((_webContents, _permission, callback) => {
+    callback(false)
+  })
   createWindow()
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

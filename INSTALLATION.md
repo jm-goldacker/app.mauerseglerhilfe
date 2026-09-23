@@ -115,7 +115,7 @@ docker compose -f docker-compose.prod.yml logs -f
 | URL | Erwartetes Ergebnis |
 |-----|---------------------|
 | `https://mauersegler.goldacker-it-solutions.de` | App lädt, Weiterleitung zum Keycloak-Login |
-| `https://api.mauersegler.goldacker-it-solutions.de/swagger` | Swagger UI der API |
+| `https://api.mauersegler.goldacker-it-solutions.de/health` | `Healthy` (Swagger ist nur im Development-Modus aktiv) |
 | `https://auth.mauersegler.goldacker-it-solutions.de/auth` | Keycloak-Adminoberfläche |
 
 ---
@@ -128,6 +128,18 @@ docker compose -f docker-compose.prod.yml --env-file .env.prod up -d
 ```
 
 Die API führt Datenbankmigrationen automatisch beim Start aus.
+
+> **Keycloak-Versionssprung (z. B. 22 → 26):** Keycloak migriert seine
+> Datenbank beim ersten Start automatisch und nicht umkehrbar. Vorher ein
+> Backup anlegen:
+>
+> ```bash
+> docker compose -f docker-compose.prod.yml --env-file .env.prod exec postgres-keycloak \
+>   pg_dump -U keycloak keycloak > keycloak-backup-$(date +%F).sql
+> ```
+>
+> Nach dem Start in den Logs prüfen, ob die Migration durchgelaufen ist
+> (`docker compose -f docker-compose.prod.yml logs -f keycloak`).
 
 ---
 
