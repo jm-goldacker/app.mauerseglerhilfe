@@ -58,3 +58,27 @@ docker compose --env-file .env.prod -f docker-compose.prod.yml up -d
 > automatisch; ohne die Datei starten API/Keycloak mit leeren Zugangsdaten.
 
 Datenbank-Migrationen wendet die API beim Start automatisch an.
+
+### Images bauen und veröffentlichen
+
+Der Server läuft auf **amd64**. Beim Bauen auf einem ARM-Rechner (z. B.
+Apple Silicon, Windows on ARM) muss die Zielplattform explizit angegeben
+werden, sonst entstehen arm64-Images, die auf dem Server mit
+`exec format error` abbrechen:
+
+```bash
+# API (im Repo api.mauerseglerhilfe)
+docker build --platform linux/amd64 -f api.mauerseglerhilfe/Dockerfile \
+  -t mgoldacker/api-mauerseglerhilfe:latest -t mgoldacker/api-mauerseglerhilfe:$(date +%F) .
+
+# App (in diesem Repo)
+docker build --platform linux/amd64 \
+  -t mgoldacker/mauerseglerhilfe-app:latest -t mgoldacker/mauerseglerhilfe-app:$(date +%F) .
+
+docker push --all-tags mgoldacker/api-mauerseglerhilfe
+docker push --all-tags mgoldacker/mauerseglerhilfe-app
+```
+
+Die Build-Stages laufen dank `--platform=$BUILDPLATFORM` nativ auf dem
+Build-Rechner (schnell, ohne Emulation); nur das Laufzeit-Image wird für
+amd64 erzeugt.
