@@ -7,3 +7,5 @@ INSTALLATION.md
 README.md
 docker-compose.dev.yml
 docker-compose.prod.yml
+.env
+.env.*
